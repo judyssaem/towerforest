@@ -787,7 +787,7 @@ function buildSky() {
 
   // 구름
   cloudGroup = new THREE.Group();
-  const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x9aa9b8, fog: false, flatShading: true });
+  const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x9aa9b8, fog: false });
   const puff = new THREE.IcosahedronGeometry(1, 1);
   const rnd = seeded(7);
   for (let i = 0; i < 9; i++) {
@@ -834,7 +834,7 @@ function buildGround() {
   const trunkGeo = new THREE.CylinderGeometry(0.08, 0.11, 0.55, 6); trunkGeo.translate(0, 0.275, 0);
   const crownGeo = new THREE.IcosahedronGeometry(0.5, 0);
   const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8d6e4f });
-  const crownMats = [0x4f8f3a, 0x5c9e44, 0x467f33].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true }));
+  const crownMats = [0x4f8f3a, 0x5c9e44, 0x467f33].map(c => new THREE.MeshLambertMaterial({ color: c }));
   const rnd2 = seeded(11);
   for (let i = 0; i < 26; i++) {
     const ang = (i / 26) * Math.PI * 2 + rnd2() * 0.2;
@@ -1096,7 +1096,7 @@ function placeBuilding3D(r, c, height, animated = true) {
     aw.position.set(-0.1, 0.84, 0.72); aw.rotation.x = 0.3;
     addPart(group, aw, r, c, decor);
   } else if (height === 2) {
-    const roof = new THREE.Mesh(GEO.gable, new THREE.MeshLambertMaterial({ color, flatShading: true }));
+    const roof = new THREE.Mesh(GEO.gable, new THREE.MeshLambertMaterial({ color }));
     roof.position.y = top;
     addPart(group, roof, r, c, decor);
   } else if (height === 3) {
