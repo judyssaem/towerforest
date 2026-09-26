@@ -1,39 +1,1448 @@
-© 주디쌤
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Skyscrapers: 들쑥날쑥 빌딩 숲</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page-bg: #fdfbf7;
+  --start-bg: #e3f2fd;
+  --ink: #4a4a4a;
+  --panel: #ffffff;
+  /* 층별 색 : 1층 빨강, 2층 노랑, 3층 초록, 4층 파랑 */
+  --f1: #e84b3c; --f1-soft: #ffd6d1; --f1-ink: #a3261a;
+  --f2: #f7c42f; --f2-soft: #fff4c2; --f2-ink: #8a6200;
+  --f3: #2fbf62; --f3-soft: #cdf5da; --f3-ink: #146b33;
+  --f4: #2f74dc; --f4-soft: #cfe1ff; --f4-ink: #123f86;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --page-bg: #f4f1ea; --start-bg: #d9ebfb; }
+}
+:root[data-theme="dark"] { --page-bg: #f4f1ea; --start-bg: #d9ebfb; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
 
-# Skyscrapers
+body {
+  font-family: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  margin: 0; height: 100%;
+  overflow: hidden;
+  user-select: none; -webkit-user-select: none;
+  background-color: var(--page-bg);
+  background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--ink);
+  touch-action: none;
+}
 
-들쑥날쑥 빌딩 숲 🏙️
+#ui-layer {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding-top: calc(10px + env(safe-area-inset-top, 0px));
+  padding-bottom: 90px;
+  box-sizing: border-box;
+}
 
-블록 세계
+h1 {
+  color: #5c6bc0; margin: 5px 0; font-size: 2.0rem;
+  text-shadow: 3px 3px 0px #c5cae9;
+  pointer-events: auto;
+  background: var(--panel);
+  padding: 5px 25px; border-radius: 50px; border: 3px solid #5c6bc0;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  z-index: 20; flex-shrink: 0;
+}
 
-직접 건물을 지어봐요
+#message {
+  margin: 2px 0 5px; font-size: 1.25rem; min-height: 30px;
+  font-weight: bold; color: #ef5350;
+  pointer-events: auto; z-index: 20; flex-shrink: 0;
+  background: rgba(255,255,255,0.9);
+  padding: 3px 18px; border-radius: 20px;
+  box-sizing: border-box; display: flex; align-items: center;
+}
+#message:empty { visibility: hidden; }
 
-숫자 세계
+.controls-area {
+  pointer-events: auto; position: absolute;
+  bottom: calc(15px + env(safe-area-inset-bottom, 0px));
+  display: flex; gap: 15px;
+  background: rgba(255,255,255,0.95);
+  padding: 10px 25px; border-radius: 25px; border: 4px solid #b3e5fc;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  z-index: 20;
+}
 
-숫자로 문제를 해결해요
+button {
+  padding: 10px 20px; font-family: inherit; font-size: 1.1rem;
+  border: none; border-radius: 15px; cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.15);
+  transition: all 0.1s; color: white;
+}
+button:active { transform: translateY(5px); box-shadow: none; }
+button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outline: 3px solid #1565c0; outline-offset: 3px; }
 
-×
+.btn-home { background-color: #78909c; }
+.btn-prev { background-color: #ffb74d; }
+.btn-next { background-color: #42a5f5; }
+.btn-check { background-color: #66bb6a; }
+.btn-reset { background-color: #ef5350; }
 
-## 🏙️ 스카이스크래퍼 놀이 방법
+#start-screen {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: var(--start-bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  z-index: 100; pointer-events: auto;
+}
+#lang-btn {
+  position: absolute; top: calc(20px + env(safe-area-inset-top, 0px)); left: 20px;
+  background-color: #5c6bc0; color: white; font-size: 1.2rem;
+  padding: 10px 20px; border-radius: 20px; box-shadow: 0 4px 0 #3949ab; z-index: 101;
+}
+#lang-btn:active { transform: translateY(4px); box-shadow: none; }
 
-1\. 건물의 개수 3x3 판: 1, 2, 3층 건물이 각각 3개씩, 총 9개가 필요해요.\
-4x4 판: 1, 2, 3, 4층 건물이 각각 4개씩, 총 16개가 필요해요.
+.teacher-mark {
+  position: absolute; top: calc(20px + env(safe-area-inset-top, 0px)); right: 20px;
+  font-size: 1.0rem; color: #5c6bc0; font-weight: bold;
+  z-index: 101; pointer-events: none;
+}
 
-2\. 건물 세우기 가로줄과 세로줄에 층별 건물을 모두 한 개씩 세워주세요.\
-한 줄에 같은 높이의 건물이 두 개 있으면 안 돼요!
+.title-container {
+  text-align: center; margin-bottom: 30px; background: white;
+  padding: 30px 60px; border-radius: 40px; border: 6px solid #90caf9;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+.main-title { font-size: 3.5rem; color: #1565c0; margin: 0; line-height: 1.2; text-shadow: 2px 2px 0 #bbdefb; border: none; box-shadow: none; padding: 0; background: none; }
+.sub-title { font-size: 2.2rem; color: #5c6bc0; margin-top: 10px; display: block; }
 
-3\. 보이는 건물 수 화살표의 숫자는 그곳에 서서 줄을 바라봤을 때 눈에 보이는 건물의 개수예요.
+.mode-container { display: flex; gap: 30px; margin-bottom: 30px; }
+.mode-card {
+  background: white; padding: 40px; border-radius: 30px; text-align: center; width: 220px;
+  cursor: pointer; border: 5px solid white;
+  box-shadow: 0 10px 20px rgba(100,181,246,0.3);
+  transition: transform 0.2s, border-color 0.2s;
+}
+.mode-card:hover { transform: scale(1.05); border-color: #64b5f6; }
+.mode-icon { display: block; width: 130px; height: 112px; margin: 0 auto 14px; overflow: visible; }
+.mode-title { font-size: 2rem; color: #1565c0; margin: 0; font-weight: bold; }
+.mode-desc { color: #777; font-size: 1rem; margin-top: 10px; word-break: keep-all; }
 
-4\. 상상해보세요! 앞에 높은 건물이 있으면, 뒤에 있는 낮은 건물은 가려져서 보이지 않아요.
+.btn-help {
+  background-color: #ffca28; color: #5d4037; font-size: 1.5rem;
+  padding: 15px 40px; border-radius: 30px; border: 4px solid #fff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+.btn-help:hover { background-color: #ffb300; }
 
-# 문제 1
+.modal {
+  display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5); align-items: center; justify-content: center;
+}
+.modal-content {
+  background-color: #fff; padding: 30px; border-radius: 25px;
+  width: 85%; max-width: 600px; max-height: 85vh; overflow-y: auto;
+  position: relative; text-align: left; border: 6px solid #ffca28;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: fadeIn 0.3s;
+}
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .modal-content { animation: none; } .mode-card { transition: none; } }
+.modal-header { text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #eee; padding-bottom: 10px; }
+.modal-title { font-size: 1.8rem; color: #5c6bc0; margin: 0; }
+.rule-item { margin-bottom: 20px; }
+.rule-name { font-size: 1.3rem; color: #ff6f00; font-weight: bold; display: block; margin-bottom: 5px; }
+.rule-desc { font-size: 1.1rem; color: #444; line-height: 1.5; word-break: keep-all; }
+.close-btn {
+  position: absolute; top: 15px; right: 20px; font-size: 35px; font-weight: bold; color: #aaa;
+  cursor: pointer; line-height: 1; transition: color 0.2s;
+}
+.close-btn:hover { color: #ef5350; }
 
-무엇을 세울까요?
+/* ---------- 숫자 세계(2D) ---------- */
+#game-2d-container {
+  display: none; pointer-events: auto; flex: none; margin-top: 5px;
+  align-items: center; justify-content: center; width: 100%; z-index: 10;
+  overflow-x: auto;
+}
+.game-board-2d {
+  display: grid; background-color: white; border-radius: 20px;
+  border: 5px solid #b39ddb; box-shadow: 0 8px 0 #9575cd;
+}
+.cell-2d {
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px; cursor: pointer;
+  background-color: #f5f5f5; border: 2px solid #e0e0e0; color: #555;
+  transition: background 0.2s;
+}
+.clue-2d { background: transparent; border: none; cursor: default; display: flex; align-items: center; justify-content: center; }
+.clue-badge {
+  background-color: #ff8a65; color: white; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 0 #d84315; z-index: 2; flex-shrink: 0;
+}
+.arrow-icon { color: #ff7043; font-weight: bold; flex-shrink: 0; }
+.clue-top { flex-direction: column; gap: 2px; }
+.clue-bottom { flex-direction: column-reverse; gap: 2px; }
+.clue-left { flex-direction: row; gap: 3px; }
+.clue-right { flex-direction: row-reverse; gap: 3px; }
 
-1층 건물 남은 개수: 3
+.h1 { background-color: var(--f1-soft); border-color: var(--f1); color: var(--f1-ink); }
+.h2 { background-color: var(--f2-soft); border-color: var(--f2); color: var(--f2-ink); }
+.h3 { background-color: var(--f3-soft); border-color: var(--f3); color: var(--f3-ink); }
+.h4 { background-color: var(--f4-soft); border-color: var(--f4); color: var(--f4-ink); }
 
-2층 건물 남은 개수: 3
+/* ---------- 인벤토리 ---------- */
+#inventory-sidebar {
+  display: none; position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.96); padding: 15px; border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  pointer-events: auto; flex-direction: column; gap: 10px; z-index: 20;
+  border: 3px solid #b3e5fc;
+}
+.inv-header { text-align: center; font-size: 1rem; color: #555; margin-bottom: 5px; }
+.inv-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 14px;
+  border: 3px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+  background: #fafafa;
+}
+.inv-item:hover { transform: scale(1.05); }
+.inv-item.selected { border-color: #2196F3; background-color: #e3f2fd; box-shadow: 0 3px 0 #90caf9; }
+.block-preview { width: 34px; height: 46px; flex-shrink: 0; display: block; }
+.block-info { display: flex; flex-direction: column; }
+.floor-name { font-size: 0.95rem; color: #333; }
+.floor-count { font-size: 0.8rem; color: #888; }
+.count-num { color: #d32f2f; font-weight: bold; font-size: 1rem; }
 
-3층 건물 남은 개수: 3
+#sound-btn {
+  display: none; position: absolute; z-index: 30;
+  top: calc(12px + env(safe-area-inset-top, 0px)); left: 12px;
+  width: 48px; height: 48px; padding: 0; border-radius: 50%;
+  background: rgba(255,255,255,0.95); border: 3px solid #b3e5fc;
+  line-height: 0; box-shadow: 0 4px 0 rgba(0,0,0,0.12);
+  display: none; align-items: center; justify-content: center;
+}
+#canvas-3d {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 0; display: none; touch-action: none;
+}
 
-4층 건물 남은 개수: 4
+@media (max-width: 768px) {
+  h1 { font-size: 1.5rem; padding: 5px 15px; }
+  #message { font-size: 1.05rem; min-height: 26px; }
+  .controls-area { width: 95%; gap: 5px; padding: 5px; bottom: calc(5px + env(safe-area-inset-bottom, 0px)); justify-content: center; box-sizing: border-box; }
+  .controls-area button { padding: 8px 10px; font-size: 0.9rem; flex: 1 0 auto; }
+  #inventory-sidebar { transform: scale(0.82) translateY(-60%); transform-origin: right center; right: 4px; border-width: 2px; padding: 10px; }
+  .main-title { font-size: 2.2rem; }
+  .sub-title { font-size: 1.4rem; }
+  .title-container { padding: 20px 30px; }
+  #start-screen { padding: calc(70px + env(safe-area-inset-top, 0px)) 12px 20px; box-sizing: border-box; justify-content: flex-start; overflow-y: auto; }
+  .title-container { margin-bottom: 20px; }
+  .mode-container { gap: 12px; width: 100%; max-width: 380px; margin-bottom: 20px; }
+  .mode-card { width: auto; flex: 1 1 0; min-width: 0; padding: 18px 10px; border-radius: 24px; }
+  .btn-help { font-size: 1.2rem; padding: 12px 32px; }
+  .mode-icon { width: 92px; height: 80px; margin: 0 auto 8px; }
+  .mode-title { font-size: 1.4rem; }
+  .teacher-mark { font-size: 0.9rem; right: 15px; }
+}
+@media (max-width: 600px) {
+  .controls-area { flex-wrap: wrap; gap: 5px; border-width: 3px; border-radius: 18px; }
+  .controls-area button { flex: 1 1 28%; font-size: 0.85rem; padding: 7px 4px; box-shadow: 0 3px 0 rgba(0,0,0,0.15); }
+  #inventory-sidebar {
+    top: auto; right: auto; left: 50%;
+    bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    flex-direction: row; gap: 5px; padding: 6px; border-radius: 16px;
+    max-width: 96%; box-sizing: border-box;
+  }
+  .inv-header { display: none; }
+  .inv-item { flex-direction: column; gap: 2px; padding: 4px 6px; border-width: 2px; text-align: center; }
+  .inv-item:hover { transform: none; }
+  .block-preview { width: 24px; height: 32px; }
+  .block-info { align-items: center; }
+  .floor-name { font-size: 0.72rem; white-space: nowrap; }
+  .floor-count { font-size: 0.7rem; white-space: nowrap; }
+  .count-num { font-size: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<div id="start-screen">
+  <button id="lang-btn" onclick="toggleLanguage()">English</button>
+  <div class="teacher-mark">© 주디쌤</div>
+  <div class="title-container">
+    <h1 class="main-title">Skyscrapers</h1>
+    <span class="sub-title" id="t-subtitle">들쑥날쑥 빌딩 숲 🏙️</span>
+  </div>
+  <div class="mode-container">
+    <div class="mode-card" tabindex="0" onclick="startMode('3d')" onkeydown="if(event.key==='Enter')startMode('3d')">
+      <svg class="mode-icon" viewBox="0 0 120 104" aria-hidden="true"><g stroke="#d9b155" stroke-width="1.6" stroke-linejoin="round"><path d="M72 36 L94 48.7 L72 61.4 L50 48.7 Z" fill="#fff4c9"/><path d="M50 48.7 L72 61.4 L72 86.4 L50 73.7 Z" fill="#ffe49a"/><path d="M72 61.4 L94 48.7 L94 73.7 L72 86.4 Z" fill="#f7d377"/></g><g stroke="#66bd86" stroke-width="1.6" stroke-linejoin="round"><path d="M72 11 L94 23.7 L72 36.4 L50 23.7 Z" fill="#dcf7e5"/><path d="M50 23.7 L72 36.4 L72 61.4 L50 48.7 Z" fill="#b2e9c5"/><path d="M72 36.4 L94 23.7 L94 48.7 L72 61.4 Z" fill="#93d9ad"/></g><g stroke="#df7f74" stroke-width="1.6" stroke-linejoin="round"><path d="M50 48.7 L72 61.400000000000006 L50 74.1 L28 61.400000000000006 Z" fill="#ffe0dc"/><path d="M28 61.400000000000006 L50 74.1 L50 99.1 L28 86.4 Z" fill="#ffbcb4"/><path d="M50 74.1 L72 61.400000000000006 L72 86.4 L50 99.1 Z" fill="#f7a198"/></g></svg>
+      <p class="mode-title" id="t-mode-3d-title">블록 세계</p>
+      <p class="mode-desc" id="t-mode-3d-desc">직접 건물을 지어봐요</p>
+    </div>
+    <div class="mode-card" tabindex="0" onclick="startMode('2d')" onkeydown="if(event.key==='Enter')startMode('2d')">
+      <svg class="mode-icon" viewBox="0 0 120 104" aria-hidden="true"><rect x="4" y="68" width="36" height="36" rx="9" fill="#f7a198"/><rect x="4" y="64" width="36" height="36" rx="9" fill="#ffe6e2" stroke="#f7a198" stroke-width="3"/><text x="22.0" y="83.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#c96a5f">1</text><rect x="42" y="44" width="36" height="36" rx="9" fill="#f5d377"/><rect x="42" y="40" width="36" height="36" rx="9" fill="#fff6d6" stroke="#f5d377" stroke-width="3"/><text x="60.0" y="59.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#b08a2c">2</text><rect x="80" y="20" width="36" height="36" rx="9" fill="#93d9ad"/><rect x="80" y="16" width="36" height="36" rx="9" fill="#e2f8ea" stroke="#93d9ad" stroke-width="3"/><text x="98.0" y="35.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#4d9e6c">3</text></svg>
+      <p class="mode-title" id="t-mode-2d-title">숫자 세계</p>
+      <p class="mode-desc" id="t-mode-2d-desc">숫자로 문제를 해결해요</p>
+    </div>
+  </div>
+  <button id="help-btn" class="btn-help">놀이 방법</button>
+</div>
+
+<div id="help-modal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn">&times;</span>
+    <div class="modal-header"><h2 class="modal-title" id="t-modal-title">🏙️ 스카이스크래퍼 놀이 방법</h2></div>
+    <div class="rule-item">
+      <span class="rule-name" id="t-rule-1-title">1. 건물의 개수</span>
+      <span class="rule-desc" id="t-rule-1-desc">3x3 판: 1, 2, 3층 건물이 각각 3개씩, 총 9개가 필요해요.<br>4x4 판: 1, 2, 3, 4층 건물이 각각 4개씩, 총 16개가 필요해요.</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-name" id="t-rule-2-title">2. 건물 세우기</span>
+      <span class="rule-desc" id="t-rule-2-desc">가로줄과 세로줄에 층별 건물을 모두 한 개씩 세워주세요.<br>한 줄에 같은 높이의 건물이 두 개 있으면 안 돼요!</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-name" id="t-rule-3-title">3. 보이는 건물 수</span>
+      <span class="rule-desc" id="t-rule-3-desc">화살표의 숫자는 그곳에 서서 줄을 바라봤을 때 눈에 보이는 건물의 개수예요.</span>
+    </div>
+    <div class="rule-item">
+      <span class="rule-name" id="t-rule-4-title">4. 상상해보세요!</span>
+      <span class="rule-desc" id="t-rule-4-desc">앞에 높은 건물이 있으면, 뒤에 있는 낮은 건물은 가려져서 보이지 않아요.</span>
+    </div>
+  </div>
+</div>
+
+<canvas id="canvas-3d"></canvas>
+
+<div id="ui-layer" style="display: none;">
+  <h1 id="level-title">문제 1</h1>
+  <div id="message"></div>
+  <div id="game-2d-container"></div>
+  <div class="controls-area">
+    <button class="btn-home" onclick="goHome()" id="t-btn-home">🏠 처음으로</button>
+    <button class="btn-prev" onclick="changeLevel(-1)" id="t-btn-prev">⬅️ 이전</button>
+    <button class="btn-check" onclick="checkAnswer()" id="t-btn-check">✅ 정답확인</button>
+    <button class="btn-reset" onclick="resetGame()" id="t-btn-reset">🔄 다시하기</button>
+    <button class="btn-next" onclick="changeLevel(1)" id="t-btn-next">다음 ➡️</button>
+  </div>
+</div>
+
+<button id="sound-btn" onclick="toggleSound()" aria-label="소리 끄기"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#5c6bc0"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#5c6bc0" stroke-width="2" stroke-linecap="round"/></svg></button>
+
+<div id="inventory-sidebar">
+  <div class="inv-header" id="t-inv-header">무엇을 세울까요?</div>
+  <div class="inv-item selected" tabindex="0" onclick="selectTool(1)" id="tool-1">
+    <svg class="block-preview" viewBox="0 0 34 46" aria-hidden="true">
+      <rect x="4" y="30" width="26" height="14" rx="1.5" fill="#e84b3c" stroke="#a3261a" stroke-width="1.2"/>
+      <path d="M6 33 L22 33 L21 31 L7 31 Z" fill="#fff" stroke="#a3261a" stroke-width="0.8"/>
+      <rect x="7" y="33" width="10" height="7" fill="#bfe3ff"/><rect x="20" y="33" width="6" height="11" fill="#7b4a2e"/>
+    </svg>
+    <div class="block-info">
+      <span class="floor-name" id="t-floor-1">1층 건물</span>
+      <span class="floor-count"><span id="t-rem-1">남은 개수:</span> <span class="count-num" id="count-1">3</span></span>
+    </div>
+  </div>
+  <div class="inv-item" tabindex="0" onclick="selectTool(2)" id="tool-2">
+    <svg class="block-preview" viewBox="0 0 34 46" aria-hidden="true">
+      <path d="M4 20 L17 16 L30 20 Z" fill="#f7c42f" stroke="#8a6200" stroke-width="1"/>
+      <rect x="4" y="20" width="26" height="12" fill="#f7c42f" stroke="#8a6200" stroke-width="1.2"/>
+      <rect x="4" y="32" width="26" height="12" fill="#f7c42f" stroke="#8a6200" stroke-width="1.2"/>
+      <rect x="8" y="23" width="6" height="6" fill="#bfe3ff"/><rect x="20" y="23" width="6" height="6" fill="#bfe3ff"/>
+      <rect x="14" y="35" width="6" height="9" fill="#7b4a2e"/>
+    </svg>
+    <div class="block-info">
+      <span class="floor-name" id="t-floor-2">2층 건물</span>
+      <span class="floor-count"><span id="t-rem-2">남은 개수:</span> <span class="count-num" id="count-2">3</span></span>
+    </div>
+  </div>
+  <div class="inv-item" tabindex="0" onclick="selectTool(3)" id="tool-3">
+    <svg class="block-preview" viewBox="0 0 34 46" aria-hidden="true">
+      <path d="M4 8 L4 6 L30 6 L30 8" stroke="#2fbf62" stroke-width="1" fill="none"/>
+      <rect x="4" y="8" width="26" height="12" fill="#2fbf62" stroke="#146b33" stroke-width="1.2"/>
+      <rect x="4" y="20" width="26" height="12" fill="#2fbf62" stroke="#146b33" stroke-width="1.2"/>
+      <rect x="4" y="32" width="26" height="12" fill="#2fbf62" stroke="#146b33" stroke-width="1.2"/>
+      <rect x="8" y="11" width="6" height="6" fill="#bfe3ff"/><rect x="20" y="11" width="6" height="6" fill="#bfe3ff"/>
+      <rect x="8" y="23" width="6" height="6" fill="#bfe3ff"/><rect x="20" y="23" width="6" height="6" fill="#bfe3ff"/>
+      <rect x="14" y="35" width="6" height="9" fill="#7b4a2e"/>
+    </svg>
+    <div class="block-info">
+      <span class="floor-name" id="t-floor-3">3층 건물</span>
+      <span class="floor-count"><span id="t-rem-3">남은 개수:</span> <span class="count-num" id="count-3">3</span></span>
+    </div>
+  </div>
+  <div class="inv-item" tabindex="0" onclick="selectTool(4)" id="tool-4" style="display:none;">
+    <svg class="block-preview" viewBox="0 0 34 46" aria-hidden="true">
+      <path d="M26 2 L26 5" stroke="#2f74dc" stroke-width="1.2"/>
+      <rect x="4" y="5" width="26" height="9.75" fill="#2f74dc" stroke="#123f86" stroke-width="1.1"/>
+      <rect x="4" y="14.75" width="26" height="9.75" fill="#2f74dc" stroke="#123f86" stroke-width="1.1"/>
+      <rect x="4" y="24.5" width="26" height="9.75" fill="#2f74dc" stroke="#123f86" stroke-width="1.1"/>
+      <rect x="4" y="34.25" width="26" height="9.75" fill="#2f74dc" stroke="#123f86" stroke-width="1.1"/>
+      <g fill="#cfe8ff"><rect x="7" y="7" width="5" height="6"/><rect x="14.5" y="7" width="5" height="6"/><rect x="22" y="7" width="5" height="6"/>
+      <rect x="7" y="16.75" width="5" height="6"/><rect x="14.5" y="16.75" width="5" height="6"/><rect x="22" y="16.75" width="5" height="6"/>
+      <rect x="7" y="26.5" width="5" height="6"/><rect x="14.5" y="26.5" width="5" height="6"/><rect x="22" y="26.5" width="5" height="6"/>
+      <rect x="11" y="36" width="12" height="8"/></g>
+    </svg>
+    <div class="block-info">
+      <span class="floor-name" id="t-floor-4">4층 건물</span>
+      <span class="floor-count"><span id="t-rem-4">남은 개수:</span> <span class="count-num" id="count-4">4</span></span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   번역
+   ========================================================= */
+const translations = {
+  ko: {
+    subtitle: "들쑥날쑥 빌딩 숲 🏙️", mode3dTitle: "블록 세계", mode3dDesc: "직접 건물을 지어봐요",
+    mode2dTitle: "숫자 세계", mode2dDesc: "숫자로 문제를 해결해요", helpBtn: "놀이 방법",
+    modalTitle: "🏙️ 스카이스크래퍼 놀이 방법",
+    rule1Title: "1. 건물의 개수", rule1Desc: "3x3 판: 1, 2, 3층 건물이 각각 3개씩, 총 9개가 필요해요.<br>4x4 판: 1, 2, 3, 4층 건물이 각각 4개씩, 총 16개가 필요해요.",
+    rule2Title: "2. 건물 세우기", rule2Desc: "가로줄과 세로줄에 층별 건물을 모두 한 개씩 세워주세요.<br>한 줄에 같은 높이의 건물이 두 개 있으면 안 돼요!",
+    rule3Title: "3. 보이는 건물 수", rule3Desc: "화살표의 숫자는 그곳에 서서 줄을 바라봤을 때 눈에 보이는 건물의 개수예요.",
+    rule4Title: "4. 상상해보세요!", rule4Desc: "앞에 높은 건물이 있으면, 뒤에 있는 낮은 건물은 가려져서 보이지 않아요.",
+    btnHome: "🏠 처음으로", btnPrev: "⬅️ 이전", btnCheck: "✅ 정답확인", btnReset: "🔄 다시하기", btnNext: "다음 ➡️",
+    invHeader: "무엇을 세울까요?", floor1: "1층 건물", floor2: "2층 건물", floor3: "3층 건물", floor4: "4층 건물",
+    remaining: "남은 개수:", levelTitle: "문제",
+    msgIncomplete: "🚧 공사가 덜 끝났어요!", msgDuplicate: "❌ 같은 줄에 높이가 같은 건물이 있어요!",
+    msgCorrect: "🎉 와우! 완벽한 도시예요!", msgWrong: "🤔 화살표 힌트와 건물 개수가 달라요.",
+    msgRemoved: "🗑️ 건물을 철거했습니다.", msgNoBlock: "🏗️ 블록이 부족해요!", langBtn: "English"
+  },
+  en: {
+    subtitle: "Building a City Skyline 🏙️", mode3dTitle: "Block World", mode3dDesc: "Build with blocks",
+    mode2dTitle: "Number World", mode2dDesc: "Solve with numbers", helpBtn: "How to Play",
+    modalTitle: "🏙️ How to Play Skyscrapers",
+    rule1Title: "1. Number of Buildings", rule1Desc: "3x3 Board: 3 of each 1, 2, 3-story buildings (Total 9).<br>4x4 Board: 4 of each 1, 2, 3, 4-story buildings (Total 16).",
+    rule2Title: "2. Building Rules", rule2Desc: "Place one building of each height in every row and column.<br>No two buildings of the same height in a line!",
+    rule3Title: "3. Visibility Rules", rule3Desc: "The number on the arrow shows how many buildings you can see from that spot looking down the line.",
+    rule4Title: "4. Imagine!", rule4Desc: "If there is a tall building in front, lower buildings behind it are hidden and cannot be seen.",
+    btnHome: "🏠 Home", btnPrev: "⬅️ Prev", btnCheck: "✅ Check", btnReset: "🔄 Reset", btnNext: "Next ➡️",
+    invHeader: "Select Building", floor1: "1-Story", floor2: "2-Story", floor3: "3-Story", floor4: "4-Story",
+    remaining: "Left:", levelTitle: "Puzzle",
+    msgIncomplete: "🚧 Construction not finished!", msgDuplicate: "❌ Duplicate heights in a line!",
+    msgCorrect: "🎉 Wow! Perfect City!", msgWrong: "🤔 Clues don't match the view.",
+    msgRemoved: "🗑️ Building removed.", msgNoBlock: "🏗️ Not enough blocks!", langBtn: "한국어"
+  }
+};
+
+let currentLang = 'ko';
+function toggleLanguage() { currentLang = currentLang === 'ko' ? 'en' : 'ko'; updateLanguage(); }
+function updateLanguage() {
+  const t = translations[currentLang];
+  const set = (id, v, html) => { const el = document.getElementById(id); if (html) el.innerHTML = v; else el.innerText = v; };
+  set('t-subtitle', t.subtitle); set('t-mode-3d-title', t.mode3dTitle); set('t-mode-3d-desc', t.mode3dDesc);
+  set('t-mode-2d-title', t.mode2dTitle); set('t-mode-2d-desc', t.mode2dDesc); set('help-btn', t.helpBtn);
+  set('lang-btn', t.langBtn); set('t-modal-title', t.modalTitle);
+  set('t-rule-1-title', t.rule1Title); set('t-rule-1-desc', t.rule1Desc, true);
+  set('t-rule-2-title', t.rule2Title); set('t-rule-2-desc', t.rule2Desc, true);
+  set('t-rule-3-title', t.rule3Title); set('t-rule-3-desc', t.rule3Desc);
+  set('t-rule-4-title', t.rule4Title); set('t-rule-4-desc', t.rule4Desc);
+  set('t-btn-home', t.btnHome); set('t-btn-prev', t.btnPrev); set('t-btn-check', t.btnCheck);
+  set('t-btn-reset', t.btnReset); set('t-btn-next', t.btnNext); set('t-inv-header', t.invHeader);
+  for (let i = 1; i <= 4; i++) { set(`t-floor-${i}`, t[`floor${i}`]); set(`t-rem-${i}`, t.remaining); }
+  if (document.getElementById('ui-layer').style.display !== 'none') {
+    const puzzle = puzzles[state.levelIdx];
+    document.getElementById('level-title').innerText = `${t.levelTitle} ${state.levelIdx + 1} (${puzzle.size}x${puzzle.size})`;
+  }
+}
+
+const helpBtn = document.getElementById('help-btn');
+const modal = document.getElementById('help-modal');
+const closeBtn = document.getElementsByClassName('close-btn')[0];
+helpBtn.onclick = () => { modal.style.display = "flex"; };
+closeBtn.onclick = () => { modal.style.display = "none"; };
+window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
+
+/* =========================================================
+   퍼즐 데이터 (원본 그대로)
+   ========================================================= */
+const puzzles = [
+  { size: 3, clues: { top: [0, 3, 0], right: [0, 0, 0], bottom: [0, 0, 0], left: [1, 0, 0] } },
+  { size: 3, clues: { top: [0, 2, 0], right: [0, 0, 2], bottom: [1, 0, 0], left: [0, 0, 0] } },
+  { size: 3, clues: { top: [2, 2, 0], right: [0, 0, 0], bottom: [2, 0, 0], left: [0, 0, 0] } },
+  { size: 3, clues: { top: [0, 2, 2], right: [0, 0, 0], bottom: [0, 0, 0], left: [0, 0, 2] } },
+  { size: 4, clues: { top: [4, 0, 1, 0], right: [0, 1, 0, 4], bottom: [0, 0, 0, 0], left: [0, 0, 0, 0] } },
+  { size: 4, clues: { top: [0, 0, 3, 0], right: [0, 0, 0, 0], bottom: [1, 0, 0, 0], left: [0, 4, 3, 0] } },
+  { size: 4, clues: { top: [0, 1, 0, 0], right: [0, 1, 0, 0], bottom: [0, 0, 0, 0], left: [2, 2, 2, 0] } },
+  { size: 4, clues: { top: [2, 0, 0, 0], right: [0, 0, 3, 0], bottom: [0, 3, 0, 3], left: [0, 3, 0, 0] } }
+];
+
+let state = { mode: null, levelIdx: 0, grid: [], selectedTool: 1, inventory: {} };
+
+/* =========================================================
+   화면 전환
+   ========================================================= */
+function startMode(mode) {
+  state.mode = mode;
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('ui-layer').style.display = 'flex';
+  if (mode === '3d') {
+    document.getElementById('canvas-3d').style.display = 'block';
+    document.getElementById('inventory-sidebar').style.display = 'flex';
+    document.getElementById('sound-btn').style.display = 'flex';
+    document.getElementById('game-2d-container').style.display = 'none';
+    init3D();
+  } else {
+    document.getElementById('canvas-3d').style.display = 'none';
+    document.getElementById('inventory-sidebar').style.display = 'none';
+    document.getElementById('sound-btn').style.display = 'none';
+    document.getElementById('game-2d-container').style.display = 'flex';
+  }
+  loadLevel(0);
+}
+function goHome() {
+  document.getElementById('canvas-3d').style.display = 'none';
+  document.getElementById('ui-layer').style.display = 'none';
+  document.getElementById('inventory-sidebar').style.display = 'none';
+  document.getElementById('sound-btn').style.display = 'none';
+  document.getElementById('start-screen').style.display = 'flex';
+}
+function loadLevel(idx) {
+  state.levelIdx = idx;
+  const puzzle = puzzles[idx];
+  const size = puzzle.size;
+  const t = translations[currentLang];
+  state.grid = Array.from({ length: size }, () => Array(size).fill(0));
+  for (let i = 1; i <= size; i++) state.inventory[i] = size;
+  if (state.selectedTool > size) selectTool(1);
+  document.getElementById('level-title').innerText = `${t.levelTitle} ${idx + 1} (${size}x${size})`;
+  document.getElementById('message').innerText = "";
+  document.getElementById('tool-4').style.display = size === 4 ? 'flex' : 'none';
+  if (state.mode === '2d') render2D();
+  else { create3DScene(); updateInventoryUI(); }
+}
+
+/* =========================================================
+   숫자 세계 (2D)
+   ========================================================= */
+function render2D() {
+  const container = document.getElementById('game-2d-container');
+  container.innerHTML = '';
+  const puzzle = puzzles[state.levelIdx];
+  const size = puzzle.size;
+  const is3x3 = size === 3;
+  const board = document.createElement('div');
+  board.className = 'game-board-2d';
+  const isSmall = window.innerWidth <= 768;
+
+  let cellSizeVal = is3x3 ? 65 : 52, hintSizeVal = is3x3 ? 60 : 50, gapVal = is3x3 ? 6 : 5;
+  let paddingVal = is3x3 ? 20 : 15, fontSizeVal = is3x3 ? 2.0 : 1.6, badgeSizeVal = is3x3 ? 38 : 32, arrowSizeVal = is3x3 ? 1.1 : 0.9;
+  if (isSmall) {
+    cellSizeVal = is3x3 ? 50 : 40; hintSizeVal = is3x3 ? 45 : 35; gapVal = 3; paddingVal = 10;
+    fontSizeVal = is3x3 ? 1.5 : 1.2; badgeSizeVal = is3x3 ? 30 : 24; arrowSizeVal = is3x3 ? 0.9 : 0.8;
+  }
+  const cellSize = `${cellSizeVal}px`, hintSize = `${hintSizeVal}px`;
+  const badgeSize = `${badgeSizeVal}px`, badgeFont = isSmall ? '0.9rem' : (is3x3 ? '1.2rem' : '1.0rem');
+  const arrowSize = `${arrowSizeVal}rem`, fontSize = `${fontSizeVal}rem`;
+
+  board.style.gap = `${gapVal}px`;
+  board.style.padding = `${paddingVal}px`;
+  board.style.gridTemplateColumns = `${hintSize} repeat(${size}, ${cellSize}) ${hintSize}`;
+  const applyCellStyle = el => { el.style.width = cellSize; el.style.height = cellSize; el.style.fontSize = fontSize; };
+  const applyHintStyle = el => { el.style.width = hintSize; el.style.height = cellSize; el.style.justifyContent = 'center'; el.style.alignItems = 'center'; el.style.display = 'flex'; };
+
+  addCell2D(board, '', applyHintStyle);
+  puzzle.clues.top.forEach(c => addClue2D(board, c, 'top', badgeSize, badgeFont, arrowSize, applyHintStyle));
+  addCell2D(board, '', applyHintStyle);
+  for (let r = 0; r < size; r++) {
+    addClue2D(board, puzzle.clues.left[r], 'left', badgeSize, badgeFont, arrowSize, applyHintStyle);
+    for (let c = 0; c < size; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell-2d';
+      applyCellStyle(cell);
+      cell.onclick = () => toggleCell2D(r, c);
+      const val = state.grid[r][c];
+      if (val > 0) { cell.innerText = val; cell.classList.add(`h${val}`); }
+      board.appendChild(cell);
+    }
+    addClue2D(board, puzzle.clues.right[r], 'right', badgeSize, badgeFont, arrowSize, applyHintStyle);
+  }
+  addCell2D(board, '', applyHintStyle);
+  puzzle.clues.bottom.forEach(c => addClue2D(board, c, 'bottom', badgeSize, badgeFont, arrowSize, applyHintStyle));
+  addCell2D(board, '', applyHintStyle);
+  container.appendChild(board);
+}
+function addCell2D(parent, text, styleFunc) { const d = document.createElement('div'); d.innerText = text; if (styleFunc) styleFunc(d); parent.appendChild(d); }
+function addClue2D(parent, val, dir, bSize, bFont, aSize, styleFunc) {
+  const wrapper = document.createElement('div');
+  wrapper.className = `clue-2d clue-${dir}`;
+  if (styleFunc) styleFunc(wrapper);
+  if (val > 0) {
+    const badge = document.createElement('div');
+    badge.className = 'clue-badge'; badge.innerText = val;
+    badge.style.width = bSize; badge.style.height = bSize; badge.style.fontSize = bFont;
+    const arrow = document.createElement('div');
+    arrow.className = 'arrow-icon'; arrow.style.fontSize = aSize;
+    arrow.innerText = { top: '▼', bottom: '▲', left: '▶', right: '◀' }[dir];
+    wrapper.appendChild(badge); wrapper.appendChild(arrow);
+  }
+  parent.appendChild(wrapper);
+}
+function toggleCell2D(r, c) {
+  const size = puzzles[state.levelIdx].size;
+  state.grid[r][c] = (state.grid[r][c] % size) + 1;
+  render2D();
+}
+
+/* =========================================================
+   블록 세계 (3D)
+   ========================================================= */
+let scene, camera, renderer, controls;
+let interactableObjects = [];
+let boardGroup, cloudGroup;
+let buildings = {};          // "r,c" -> Group
+let hoveredTile = null;
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+let isDragging = false;
+const startMouse = new THREE.Vector2();
+const tweens = [];
+const reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const TILE = 1.5, GAP = 0.2, BASE_Y = 0.1;
+const FLOOR_COLORS = { 1: '#e84b3c', 2: '#f7c42f', 3: '#2fbf62', 4: '#2f74dc' };
+const SKY_TOP = '#3b8ee0', SKY_MID = '#86c5f3', SKY_HORIZON = '#dcf0ff';
+const GRASS = '#8db35a';
+
+/* ---------- 도우미 ---------- */
+function shade(hex, l) { const c = new THREE.Color(hex); c.offsetHSL(0, 0, l); return '#' + c.getHexString(); }
+function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; }
+function canvasTex(canvas) {
+  const t = new THREE.CanvasTexture(canvas);
+  t.anisotropy = renderer ? Math.min(4, renderer.capabilities.getMaxAnisotropy()) : 1;
+  return t;
+}
+function seeded(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+
+/* ---------- 건물 벽 텍스처 ---------- */
+const texCache = {}, matCache = {};
+function drawWindow(ctx, x, y, w, h, cross = true) {
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+  const g = ctx.createLinearGradient(x, y, x + w, y + h);
+  g.addColorStop(0, '#d3edff'); g.addColorStop(1, '#78b8ea');
+  ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
+  ctx.beginPath(); ctx.moveTo(x + 3, y + h * 0.55); ctx.lineTo(x + w * 0.45, y + 3); ctx.lineTo(x + w * 0.62, y + 3); ctx.lineTo(x + 3, y + h * 0.78); ctx.fill();
+  if (cross) { ctx.fillStyle = '#ffffff'; ctx.fillRect(x + w / 2 - 2, y, 4, h); ctx.fillRect(x, y + h / 2 - 2, w, 4); }
+}
+function drawDoor(ctx, x, y, w, h) {
+  ctx.fillStyle = '#ffffff'; ctx.fillRect(x - 3, y - 3, w + 6, h + 3);
+  ctx.fillStyle = '#7b4a2e'; ctx.fillRect(x, y, w, h);
+  ctx.fillStyle = '#5d3520'; ctx.fillRect(x + 4, y + 5, w - 8, h * 0.35); ctx.fillRect(x + 4, y + h * 0.5, w - 8, h * 0.4);
+  ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(x + w - 7, y + h * 0.55, 3, 0, Math.PI * 2); ctx.fill();
+}
+function wallTexture(color, kind) {
+  const key = color + kind;
+  if (texCache[key]) return texCache[key];
+  const S = 128;
+  const [cv, ctx] = makeCanvas(S, S);
+  ctx.fillStyle = color; ctx.fillRect(0, 0, S, S);
+  // 벽돌 느낌의 은은한 가로줄
+  ctx.fillStyle = shade(color, -0.03);
+  for (let y = 16; y < S - 12; y += 16) ctx.fillRect(0, y, S, 2);
+  // 층 구분 띠 (위: 밝게, 아래: 진하게) → 층수를 셀 수 있게
+  ctx.fillStyle = shade(color, 0.12); ctx.fillRect(0, 0, S, 5);
+  ctx.fillStyle = shade(color, -0.2); ctx.fillRect(0, S - 11, S, 11);
+
+  if (kind === 'win2') { drawWindow(ctx, 18, 28, 34, 44); drawWindow(ctx, 76, 28, 34, 44); }
+  else if (kind === 'apt') {
+    drawWindow(ctx, 18, 22, 34, 44); drawWindow(ctx, 76, 22, 34, 44);
+    ctx.fillStyle = '#f5f5f5';
+    [[12, 46], [70, 46]].forEach(([x, w]) => {
+      ctx.fillRect(x, 70, w, 5); ctx.fillRect(x, 96, w, 4);
+      for (let i = 0; i <= 5; i++) ctx.fillRect(x + i * (w - 3) / 5, 70, 3, 30);
+    });
+  }
+  else if (kind === 'win3') { [12, 50, 88].forEach(x => drawWindow(ctx, x, 22, 28, 70, false)); ctx.fillStyle = '#ffffff'; [12, 50, 88].forEach(x => ctx.fillRect(x, 55, 28, 3)); }
+  else if (kind === 'shopFront') { drawWindow(ctx, 12, 40, 58, 62, false); drawDoor(ctx, 84, 44, 32, 73); }
+  else if (kind === 'shopSide') { drawWindow(ctx, 22, 36, 84, 54); }
+  else if (kind === 'doorFront') { drawWindow(ctx, 12, 32, 26, 30); drawWindow(ctx, 90, 32, 26, 30); drawDoor(ctx, 47, 48, 34, 69); }
+  else if (kind === 'lobby') {
+    ctx.fillStyle = '#263238'; ctx.fillRect(24, 32, 80, 85);
+    drawWindow(ctx, 28, 36, 72, 81, false);
+    ctx.fillStyle = '#263238'; ctx.fillRect(62, 36, 4, 81);
+    ctx.fillStyle = '#ffffff'; ctx.fillRect(56, 72, 3, 14); ctx.fillRect(69, 72, 3, 14);
+  }
+  const t = canvasTex(cv);
+  texCache[key] = t;
+  return t;
+}
+function wallMat(color, kind) {
+  const key = 'w' + color + kind;
+  if (!matCache[key]) matCache[key] = new THREE.MeshLambertMaterial({ map: wallTexture(color, kind) });
+  return matCache[key];
+}
+function plainMat(color) {
+  const key = 'p' + color;
+  if (!matCache[key]) matCache[key] = new THREE.MeshLambertMaterial({ color });
+  return matCache[key];
+}
+function awningMat() {
+  if (matCache.awning) return matCache.awning;
+  const [cv, ctx] = makeCanvas(128, 32);
+  for (let i = 0; i < 8; i++) { ctx.fillStyle = i % 2 ? '#ffffff' : FLOOR_COLORS[1]; ctx.fillRect(i * 16, 0, 16, 32); }
+  matCache.awning = new THREE.MeshLambertMaterial({ map: canvasTex(cv) });
+  return matCache.awning;
+}
+
+/* 층별 벽 무늬 구성: [앞(+z), 옆·뒤] */
+function floorKinds(height, floorIdx) {
+  if (height === 1) return ['shopFront', 'shopSide'];
+  if (height === 2) return floorIdx === 0 ? ['doorFront', 'win2'] : ['win2', 'win2'];
+  if (height === 3) return floorIdx === 0 ? ['doorFront', 'win2'] : ['apt', 'apt'];
+  return floorIdx === 0 ? ['lobby', 'win3'] : ['win3', 'win3'];
+}
+
+/* ---------- 공유 도형 ---------- */
+let GEO = null;
+function buildGeometries() {
+  const floor = new THREE.BoxGeometry(1.3, 1, 1.3); floor.translate(0, 0.5, 0);
+  const roofShape = new THREE.Shape();
+  roofShape.moveTo(-0.65, 0); roofShape.lineTo(0.65, 0); roofShape.lineTo(0, 0.13); roofShape.lineTo(-0.65, 0);
+  const gable = new THREE.ExtrudeGeometry(roofShape, { depth: 1.3, bevelEnabled: false });
+  gable.translate(0, 0, -0.65);
+  GEO = {
+    floor,
+    gable,
+    trim: (() => { const g = new THREE.BoxGeometry(1.38, 0.07, 1.38); g.translate(0, 0.035, 0); return g; })(),
+    awning: new THREE.BoxGeometry(0.9, 0.025, 0.16),
+    railX: new THREE.BoxGeometry(1.3, 0.035, 0.035),
+    railZ: new THREE.BoxGeometry(0.035, 0.035, 1.3),
+    post: (() => { const g = new THREE.BoxGeometry(0.035, 0.1, 0.035); g.translate(0, 0.05, 0); return g; })(),
+    tank: (() => { const g = new THREE.CylinderGeometry(0.15, 0.15, 0.26, 12); g.translate(0, 0.13, 0); return g; })(),
+    roofBox: (() => { const g = new THREE.BoxGeometry(0.5, 0.2, 0.45); g.translate(0, 0.1, 0); return g; })(),
+    antenna: (() => { const g = new THREE.CylinderGeometry(0.02, 0.02, 0.28, 6); g.translate(0, 0.14, 0); return g; })(),
+    tip: new THREE.SphereGeometry(0.06, 10, 8),
+    tile: new THREE.BoxGeometry(TILE, 0.2, TILE)
+  };
+}
+
+/* ---------- 초기화 ---------- */
+function init3D() {
+  if (renderer) return;
+  const canvas = document.getElementById('canvas-3d');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(SKY_HORIZON, 45, 230);
+  camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.enablePan = false;
+  controls.minDistance = 6;
+  controls.maxDistance = 32;
+  controls.maxPolarAngle = Math.PI / 2 - 0.08;
+
+  buildGeometries();
+  buildSky();
+  buildGround();
+  buildLights();
+
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointerleave', () => setHover(null));
+  animate();
+}
+
+/* ---------- 하늘 ---------- */
+function buildSky() {
+  const [cv, ctx] = makeCanvas(4, 512);
+  const g = ctx.createLinearGradient(0, 0, 0, 512);
+  g.addColorStop(0.0, SKY_TOP);
+  g.addColorStop(0.3, SKY_MID);
+  g.addColorStop(0.5, SKY_HORIZON);
+  g.addColorStop(1.0, SKY_HORIZON);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 4, 512);
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(400, 32, 24),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), side: THREE.BackSide, fog: false, depthWrite: false })
+  );
+  scene.add(sky);
+
+  // 해
+  const [sc, sctx] = makeCanvas(256, 256);
+  const sg = sctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  sg.addColorStop(0.0, 'rgba(255,253,230,1)');
+  sg.addColorStop(0.22, 'rgba(255,240,170,1)');
+  sg.addColorStop(0.32, 'rgba(255,225,120,0.55)');
+  sg.addColorStop(1.0, 'rgba(255,225,120,0)');
+  sctx.fillStyle = sg; sctx.fillRect(0, 0, 256, 256);
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(sc), fog: false, depthWrite: false, transparent: true }));
+  sun.scale.set(70, 70, 1);
+  sun.position.set(150, 42, -250);
+  scene.add(sun);
+
+  // 구름
+  cloudGroup = new THREE.Group();
+  const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x9aa9b8, fog: false, flatShading: true });
+  const puff = new THREE.IcosahedronGeometry(1, 1);
+  const rnd = seeded(7);
+  for (let i = 0; i < 9; i++) {
+    const cloud = new THREE.Group();
+    const n = 4 + Math.floor(rnd() * 3);
+    for (let j = 0; j < n; j++) {
+      const m = new THREE.Mesh(puff, cloudMat);
+      const s = 3.2 + rnd() * 3;
+      m.scale.set(s * 1.25, s * 0.8, s);
+      m.position.set((j - n / 2) * 4 + rnd() * 2, rnd() * 1.6, rnd() * 3 - 1.5);
+      cloud.add(m);
+    }
+    const ang = (i / 9) * Math.PI * 2 + rnd() * 0.4;
+    const rad = 120 + rnd() * 60;
+    cloud.position.set(Math.sin(ang) * rad, 14 + rnd() * 16, -Math.cos(ang) * rad);
+    cloud.lookAt(0, cloud.position.y, 0);
+    cloudGroup.add(cloud);
+  }
+  scene.add(cloudGroup);
+}
+
+/* ---------- 땅 ---------- */
+let envNature, envCity;
+const trees = [];   // 시야를 가리면 작아지는 나무들
+function buildGround() {
+  envNature = new THREE.Group(); scene.add(envNature);
+  const [cv, ctx] = makeCanvas(64, 64);
+  ctx.fillStyle = GRASS; ctx.fillRect(0, 0, 64, 64);
+  const rnd = seeded(3);
+  for (let i = 0; i < 260; i++) {
+    ctx.fillStyle = rnd() > 0.5 ? shade(GRASS, 0.05) : shade(GRASS, -0.05);
+    ctx.fillRect(Math.floor(rnd() * 64), Math.floor(rnd() * 64), 2, 3);
+  }
+  const tex = canvasTex(cv);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(90, 90);
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(320, 64), new THREE.MeshLambertMaterial({ map: tex }));
+  ground.rotation.x = -Math.PI / 2;
+  ground.position.y = -0.3;
+  ground.receiveShadow = true;
+  envNature.add(ground);
+
+  // 나무 (도시 광장 바깥 잔디 위)
+  const trunkGeo = new THREE.CylinderGeometry(0.08, 0.11, 0.55, 6); trunkGeo.translate(0, 0.275, 0);
+  const crownGeo = new THREE.IcosahedronGeometry(0.5, 0);
+  const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8d6e4f });
+  const crownMats = [0x4f8f3a, 0x5c9e44, 0x467f33].map(c => new THREE.MeshLambertMaterial({ color: c, flatShading: true }));
+  const rnd2 = seeded(11);
+  for (let i = 0; i < 26; i++) {
+    const ang = (i / 26) * Math.PI * 2 + rnd2() * 0.2;
+    const rad = 9 + rnd2() * 7;
+    if (Math.abs(ang - Math.PI) < 0.75) continue;   // 처음 카메라 앞쪽은 비워 둠
+    const tree = new THREE.Group();
+    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+    const crown = new THREE.Mesh(crownGeo, crownMats[i % 3]);
+    crown.position.y = 0.85; crown.scale.set(1, 1.15, 1);
+    trunk.castShadow = crown.castShadow = true;
+    tree.add(trunk, crown);
+    const s = 0.9 + rnd2() * 0.6;
+    tree.scale.set(s, s, s);
+    tree.position.set(Math.sin(ang) * rad, -0.3, -Math.cos(ang) * rad);
+    envNature.add(tree); trees.push({ obj: tree, s, cur: s });
+  }
+  buildCity(trunkGeo, crownGeo, trunkMat, crownMats);
+}
+
+
+/* ---------- 도시 전경 (4x4) ---------- */
+function buildCity(trunkGeo, crownGeo, trunkMat, crownMats) {
+  envCity = new THREE.Group(); envCity.visible = false; scene.add(envCity);
+  const Y = -0.3;
+
+  // 보도
+  const [sc, sctx] = makeCanvas(64, 64);
+  sctx.fillStyle = '#c9c6bf'; sctx.fillRect(0, 0, 64, 64);
+  sctx.fillStyle = '#b7b3aa'; sctx.fillRect(0, 0, 64, 2); sctx.fillRect(0, 0, 2, 64);
+  const stex = canvasTex(sc); stex.wrapS = stex.wrapT = THREE.RepeatWrapping; stex.repeat.set(200, 200);
+  const walk = new THREE.Mesh(new THREE.CircleGeometry(320, 64), new THREE.MeshLambertMaterial({ map: stex }));
+  walk.rotation.x = -Math.PI / 2; walk.position.y = Y; walk.receiveShadow = true;
+  envCity.add(walk);
+
+  // 도로 (격자) : 중심선 ±7, ±20, ±33, ±46, ±59
+  const lines = [-59, -46, -33, -20, -7, 7, 20, 33, 46, 59];
+  const ROAD_W = 2.4, ROAD_L = 150;
+  const [rc, rctx] = makeCanvas(32, 128);
+  rctx.fillStyle = '#5b6066'; rctx.fillRect(0, 0, 32, 128);
+  rctx.fillStyle = '#f5f5f5'; rctx.fillRect(15, 10, 2, 50);
+  const rtex = canvasTex(rc); rtex.wrapS = rtex.wrapT = THREE.RepeatWrapping; rtex.repeat.set(1, ROAD_L / 3);
+  const roadMat = new THREE.MeshLambertMaterial({ map: rtex });
+  const roadGeo = new THREE.PlaneGeometry(ROAD_W, ROAD_L);
+  lines.forEach(v => {
+    const a = new THREE.Mesh(roadGeo, roadMat); a.rotation.x = -Math.PI / 2; a.position.set(v, Y + 0.01, 0); a.receiveShadow = true; envCity.add(a);
+    const b = new THREE.Mesh(roadGeo, roadMat); b.rotation.x = -Math.PI / 2; b.rotation.z = Math.PI / 2; b.position.set(0, Y + 0.012, v); b.receiveShadow = true; envCity.add(b);
+  });
+
+  // 배경 빌딩: 퍼즐 건물과 헷갈리지 않도록 크고, 멀리, 차분한 회색 톤
+  const tones = ['#d5d9de', '#c3cbd3', '#dcd6cc', '#b9c3cc', '#e2e0dc', '#cad1c8'];
+  const boxGeo = new THREE.BoxGeometry(1, 1, 1); boxGeo.translate(0, 0.5, 0);
+  const parkMat = new THREE.MeshLambertMaterial({ color: GRASS });
+  const centers = [-52.5, -39.5, -26.5, -13.5, 0, 13.5, 26.5, 39.5, 52.5];
+  const rnd = seeded(29);
+  const BLOCK = 10.6;
+  centers.forEach(bx => centers.forEach(bz => {
+    if (bx === 0 && bz === 0) return;
+    const dist = Math.hypot(bx, bz);
+    if (dist < 30) {
+      // 가까운 블록은 공원 (시야를 가리지 않도록)
+      const park = new THREE.Mesh(new THREE.BoxGeometry(BLOCK - 1.2, 0.08, BLOCK - 1.2), parkMat);
+      park.position.set(bx, Y + 0.04, bz); park.receiveShadow = true; envCity.add(park);
+      for (let k = 0; k < (dist < 20 ? 0 : 4); k++) {   // 바로 옆 공원은 시야를 위해 나무 없음
+        const tree = new THREE.Group();
+        const trunk = new THREE.Mesh(trunkGeo, trunkMat), crown = new THREE.Mesh(crownGeo, crownMats[k % 3]);
+        crown.position.y = 0.85; crown.scale.set(1, 1.15, 1);
+        tree.add(trunk, crown);
+        const s = 1.1 + rnd() * 0.6; tree.scale.set(s, s, s);
+        tree.position.set(bx + (rnd() - 0.5) * 7, Y + 0.08, bz + (rnd() - 0.5) * 7);
+        envCity.add(tree); trees.push({ obj: tree, s, cur: s });
+      }
+      return;
+    }
+    // 블록마다 빌딩 0~2채만 (개수를 줄여 한적하게)
+    if (rnd() < 0.3) return;
+    const count = rnd() < 0.5 ? 1 : 2;
+    for (let k = 0; k < count; k++) {
+      const w = 3.6 + rnd() * 2.2, d = 3.6 + rnd() * 2.2;
+      const h = (dist < 40 ? 6 : 9) + rnd() * (dist < 40 ? 7 : 16);
+      const tone = tones[Math.floor(rnd() * tones.length)];
+      const side = plainMat(tone);                    // 창문 없는 단순한 면
+      const topM = plainMat(shade(tone, -0.06));
+      const b = new THREE.Mesh(boxGeo, [side, side, topM, topM, side, side]);
+      b.scale.set(w, h, d);
+      const ox = count === 1 ? 0 : (k === 0 ? -2.4 : 2.4);
+      b.position.set(bx + ox, Y, bz + (rnd() - 0.5) * 3);
+      envCity.add(b);
+    }
+  }));
+}
+
+/* ---------- 빛 ---------- */
+function buildLights() {
+  scene.add(new THREE.HemisphereLight(0xe3f2ff, 0x8db35a, 0.72));
+  const sun = new THREE.DirectionalLight(0xfff3dc, 0.62);
+  sun.position.set(7, 14, 9);
+  sun.castShadow = true;
+  const small = window.innerWidth <= 768;
+  sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
+  const d = 11;
+  Object.assign(sun.shadow.camera, { left: -d, right: d, top: d, bottom: -d, near: 1, far: 40 });
+  sun.shadow.bias = -0.0008;
+  sun.shadow.radius = 3;
+  scene.add(sun);
+}
+
+/* ---------- 카메라 ---------- */
+function frameCamera(size) {
+  const aspect = window.innerWidth / window.innerHeight;
+  const k = aspect < 1 ? Math.min(2.0, 1 / Math.pow(aspect, 0.85)) : 1;
+  const target = size === 3 ? new THREE.Vector3(0, 2.2, 0.3) : new THREE.Vector3(0, 2.6, 0.3);
+  if (aspect < 0.8) target.y -= 1.4 * k;
+  const offset = size === 3 ? new THREE.Vector3(0, 4.0, 12.5) : new THREE.Vector3(0, 4.8, 15.2);
+  offset.multiplyScalar(k);
+  camera.position.copy(target).add(offset);
+  controls.target.copy(target);
+  controls.maxDistance = size === 4 ? Math.max(24, offset.length() * 1.15) : Math.max(32, offset.length() * 1.6);
+  controls.update();
+}
+
+/* ---------- 퍼즐판 ---------- */
+function cellPos(size, idx) {
+  const total = size * TILE + (size - 1) * GAP;
+  const offset = total / 2 - TILE / 2;
+  return idx * (TILE + GAP) - offset;
+}
+
+function create3DScene() {
+  if (boardGroup) scene.remove(boardGroup);
+  boardGroup = new THREE.Group();
+  scene.add(boardGroup);
+  interactableObjects = [];
+  buildings = {};
+  hoveredTile = null;
+
+  const puzzle = puzzles[state.levelIdx];
+  const size = puzzle.size;
+  const total = size * TILE + (size - 1) * GAP;
+  const offset = total / 2 - TILE / 2;
+  const half = offset + TILE / 2;
+  const plazaHalf = half + 2.5;
+
+  // 광장 (보도블록)
+  const [pc, pctx] = makeCanvas(64, 64);
+  pctx.fillStyle = '#dcd8cf'; pctx.fillRect(0, 0, 64, 64);
+  pctx.fillStyle = '#c6c1b6'; pctx.fillRect(0, 0, 64, 2); pctx.fillRect(0, 0, 2, 64); pctx.fillRect(31, 32, 2, 32); pctx.fillRect(0, 31, 64, 2);
+  const ptex = canvasTex(pc); ptex.wrapS = ptex.wrapT = THREE.RepeatWrapping;
+  ptex.repeat.set(plazaHalf, plazaHalf);
+  const plazaMats = [plainMat('#bdb7aa'), plainMat('#bdb7aa'), new THREE.MeshLambertMaterial({ map: ptex }), plainMat('#bdb7aa'), plainMat('#bdb7aa'), plainMat('#bdb7aa')];
+  const plaza = new THREE.Mesh(new THREE.BoxGeometry(plazaHalf * 2, 0.3, plazaHalf * 2), plazaMats);
+  plaza.position.y = -0.15;
+  plaza.receiveShadow = true;
+  boardGroup.add(plaza);
+
+  // 건물 부지(타일)
+  const [tc, tctx] = makeCanvas(64, 64);
+  tctx.fillStyle = '#f3e7cb'; tctx.fillRect(0, 0, 64, 64);
+  tctx.strokeStyle = '#d9c7a0'; tctx.lineWidth = 4; tctx.strokeRect(2, 2, 60, 60);
+  const tileTex = canvasTex(tc);
+  const tileSide = plainMat('#d9c7a0');
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const topMat = new THREE.MeshLambertMaterial({ map: tileTex, emissive: 0x000000 });
+      const tile = new THREE.Mesh(GEO.tile, [tileSide, tileSide, topMat, tileSide, tileSide, tileSide]);
+      tile.position.set(cellPos(size, c), 0, cellPos(size, r));
+      tile.userData = { r, c, type: 'tile', topMat };
+      tile.receiveShadow = true;
+      boardGroup.add(tile);
+      interactableObjects.push(tile);
+    }
+  }
+
+  // 단서 표지판
+  const signDist = offset + TILE + 0.8;
+  const arrowDist = half + 0.55;
+  const clues = puzzle.clues;
+  clues.top.forEach((v, i) => addClueSign(v, cellPos(size, i), -signDist, cellPos(size, i), -arrowDist, Math.PI));
+  clues.bottom.forEach((v, i) => addClueSign(v, cellPos(size, i), signDist, cellPos(size, i), arrowDist, 0));
+  clues.left.forEach((v, i) => addClueSign(v, -signDist, cellPos(size, i), -arrowDist, cellPos(size, i), -Math.PI / 2));
+  clues.right.forEach((v, i) => addClueSign(v, signDist, cellPos(size, i), arrowDist, cellPos(size, i), Math.PI / 2));
+
+  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++)
+    if (state.grid[r][c] > 0) placeBuilding3D(r, c, state.grid[r][c], false);
+
+  if (envNature) { envNature.visible = size === 3; envCity.visible = size === 4; }
+  frameCamera(size);
+}
+
+let arrowTexture = null, postGeo = null, postMat = null;
+function addClueSign(val, sx, sz, ax, az, rotZ) {
+  if (!val) return;
+  // 바닥 화살표 (줄 방향을 가리킴)
+  if (!arrowTexture) {
+    const [cv, ctx] = makeCanvas(128, 128);
+    ctx.fillStyle = '#ff7043';
+    ctx.beginPath(); ctx.moveTo(64, 14); ctx.lineTo(112, 92); ctx.lineTo(80, 92); ctx.lineTo(80, 118); ctx.lineTo(48, 118); ctx.lineTo(48, 92); ctx.lineTo(16, 92); ctx.closePath(); ctx.fill();
+    arrowTexture = canvasTex(cv);
+    postGeo = new THREE.CylinderGeometry(0.04, 0.05, 0.5, 8); postGeo.translate(0, 0.25, 0);
+    postMat = new THREE.MeshLambertMaterial({ color: 0x8d6e63 });
+  }
+  const arrow = new THREE.Mesh(new THREE.PlaneGeometry(0.75, 0.75), new THREE.MeshBasicMaterial({ map: arrowTexture, transparent: true, depthWrite: false }));
+  arrow.rotation.x = -Math.PI / 2;
+  arrow.rotation.z = rotZ;
+  arrow.position.set(ax, 0.02, az);
+  boardGroup.add(arrow);
+
+  // 표지판 기둥
+  const post = new THREE.Mesh(postGeo, postMat);
+  post.position.set(sx, 0, sz);
+  post.castShadow = true;
+  boardGroup.add(post);
+
+  // 숫자판 (항상 카메라를 바라봄)
+  const [cv, ctx] = makeCanvas(256, 256);
+  ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(128, 128, 120, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ff7043'; ctx.beginPath(); ctx.arc(128, 128, 104, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#ffffff'; ctx.font = 'bold 150px Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(String(val), 128, 138);
+  const sign = new THREE.Sprite(new THREE.SpriteMaterial({ map: canvasTex(cv) }));
+  sign.scale.set(0.66, 0.66, 1);
+  sign.position.set(sx, 0.8, sz);
+  boardGroup.add(sign);
+}
+
+/* ---------- 건물 만들기 ---------- */
+function addPart(group, mesh, r, c, parts) {
+  mesh.userData = { r, c, type: 'building' };
+  mesh.castShadow = true; mesh.receiveShadow = true;
+  group.add(mesh);
+  interactableObjects.push(mesh);
+  parts.push(mesh);
+  return mesh;
+}
+
+function placeBuilding3D(r, c, height, animated = true) {
+  removeBuilding3D(r, c, false);
+  const size = puzzles[state.levelIdx].size;
+  const color = FLOOR_COLORS[height];
+  const roofTop = plainMat(color);   // 윗면도 벽과 같은 색
+  const group = new THREE.Group();
+  group.position.set(cellPos(size, c), BASE_Y, cellPos(size, r));
+  group.userData = { r, c };
+
+  const floors = [], decor = [];
+  for (let i = 0; i < height; i++) {
+    const [front, side] = floorKinds(height, i);
+    const sm = wallMat(color, side), fm = wallMat(color, front);
+    // 면 순서: +x, -x, +y, -y, +z(앞), -z
+    const mesh = new THREE.Mesh(GEO.floor, [sm, sm, roofTop, roofTop, fm, sm]);
+    mesh.position.y = i;
+    addPart(group, mesh, r, c, floors);
+  }
+
+  // 장식은 층수 인식에 방해되지 않도록 아주 작게, 건물과 같은 색으로
+  const top = height;
+  const sameMat = plainMat(color);
+  if (height === 1) {
+    const aw = new THREE.Mesh(GEO.awning, awningMat());
+    aw.position.set(-0.1, 0.84, 0.72); aw.rotation.x = 0.3;
+    addPart(group, aw, r, c, decor);
+  } else if (height === 2) {
+    const roof = new THREE.Mesh(GEO.gable, new THREE.MeshLambertMaterial({ color, flatShading: true }));
+    roof.position.y = top;
+    addPart(group, roof, r, c, decor);
+  } else if (height === 3) {
+    [[0, 0.63], [0, -0.63]].forEach(([x, z]) => { const m = new THREE.Mesh(GEO.railX, sameMat); m.position.set(x, top + 0.1, z); addPart(group, m, r, c, decor); });
+    [[0.63, 0], [-0.63, 0]].forEach(([x, z]) => { const m = new THREE.Mesh(GEO.railZ, sameMat); m.position.set(x, top + 0.1, z); addPart(group, m, r, c, decor); });
+    [[0.63, 0.63], [-0.63, 0.63], [0.63, -0.63], [-0.63, -0.63]].forEach(([x, z]) => { const m = new THREE.Mesh(GEO.post, sameMat); m.position.set(x, top, z); addPart(group, m, r, c, decor); });
+  } else {
+    const ant = new THREE.Mesh(GEO.antenna, sameMat); ant.position.set(0.35, top, 0.35);
+    addPart(group, ant, r, c, decor);
+  }
+
+  boardGroup.add(group);
+  buildings[`${r},${c}`] = group;
+
+  // 건설 애니메이션: 아래층부터 한 층씩 쑥쑥
+  if (animated && !reduceMotion) {
+    const step = 130;
+    floors.forEach((m, i) => { m.scale.y = 0.001; addTween(m, i * step, 230, t => { m.scale.y = Math.max(0.001, easeOutBack(t)); }); });
+    decor.forEach(m => { m.visible = false; m.scale.set(0.001, 0.001, 0.001); });
+    decor.forEach(m => addTween(m, height * step, 220, t => { m.visible = true; const s = Math.max(0.001, easeOutBack(t)); m.scale.set(s, s, s); }));
+  }
+}
+
+function removeBuilding3D(r, c, animated = true) {
+  const key = `${r},${c}`;
+  const group = buildings[key];
+  if (!group) return;
+  delete buildings[key];
+  interactableObjects = interactableObjects.filter(o => !(o.userData.type === 'building' && o.userData.r === r && o.userData.c === c));
+  if (animated && !reduceMotion) {
+    addTween(group, 0, 200, t => { group.scale.y = Math.max(0.001, 1 - t); }, () => boardGroup.remove(group));
+  } else {
+    boardGroup.remove(group);
+  }
+}
+
+/* ---------- 애니메이션 ---------- */
+function easeOutBack(t) { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+function addTween(obj, delay, dur, onUpdate, onDone) { tweens.push({ start: performance.now() + delay, dur, onUpdate, onDone }); }
+
+let lastTime = performance.now();
+function animate() {
+  requestAnimationFrame(animate);
+  const now = performance.now();
+  const dt = now - lastTime; lastTime = now;
+  for (let i = tweens.length - 1; i >= 0; i--) {
+    const tw = tweens[i];
+    if (now < tw.start) continue;
+    const t = Math.min(1, (now - tw.start) / tw.dur);
+    tw.onUpdate(t);
+    if (t >= 1) { tweens.splice(i, 1); if (tw.onDone) tw.onDone(); }
+  }
+  if (cloudGroup && !reduceMotion) cloudGroup.rotation.y += dt * 0.0000035;
+  if (camera && trees.length) {
+    const cx = camera.position.x, cz = camera.position.z;
+    const tx = controls.target.x, tz = controls.target.z;
+    const dx = tx - cx, dz = tz - cz;
+    const len = Math.hypot(dx, dz) || 1;
+    const ux = dx / len, uz = dz / len;
+    const clear = 7.5;   // 퍼즐판 양옆 여유 폭
+    const k = Math.min(1, dt / 120);
+    for (const tr of trees) {
+      if (!tr.obj.parent || !tr.obj.parent.visible) continue;
+      const px = tr.obj.position.x - cx, pz = tr.obj.position.z - cz;
+      const along = px * ux + pz * uz;
+      const side = Math.abs(px * uz - pz * ux);
+      const blocking = along > -1.5 && along < len && side < clear;
+      const goal = blocking ? 0.001 : tr.s;
+      tr.cur += (goal - tr.cur) * k;
+      tr.obj.scale.setScalar(Math.max(0.001, tr.cur));
+      tr.obj.visible = tr.cur > 0.02;
+    }
+  }
+  if (controls) {
+    // 사람 눈높이(바닥 위 약 0.7)까지 시점을 내릴 수 있게: 거리에 따라 허용 각도 계산
+    const d = camera.position.distanceTo(controls.target);
+    const below = Math.max(0, Math.min(0.9, (controls.target.y - 0.7) / d));
+    controls.maxPolarAngle = Math.PI / 2 + Math.asin(below);
+    controls.update();
+  }
+  if (renderer) renderer.render(scene, camera);
+}
+
+/* ---------- 효과음 (Web Audio로 직접 합성, 외부 파일 없음) ---------- */
+let audioCtx = null, soundOn = true;
+function getAudio() {
+  if (!soundOn) return null;
+  if (!audioCtx) {
+    const C = window.AudioContext || window.webkitAudioContext;
+    if (!C) return null;
+    audioCtx = new C();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+const masters = new WeakMap();
+function out(ctx) {
+  if (!masters.has(ctx)) {
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -12; comp.knee.value = 10; comp.ratio.value = 6;
+    comp.attack.value = 0.003; comp.release.value = 0.2;
+    const g = ctx.createGain(); g.gain.value = 0.9;
+    comp.connect(g).connect(ctx.destination);
+    masters.set(ctx, comp);
+  }
+  return masters.get(ctx);
+}
+function tone(ctx, { freq, to, start, dur, type = 'triangle', vol = 0.16 }) {
+  const osc = ctx.createOscillator(), g = ctx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, start);
+  if (to) osc.frequency.exponentialRampToValueAtTime(to, start + dur);
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.012);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  osc.connect(g).connect(out(ctx));
+  osc.start(start); osc.stop(start + dur + 0.02);
+}
+// 짓기: 바닥에 '쿵' + 층마다 한 음씩 올라가는 '뿅' (도-미-솔-높은 도)
+function playBuildSound(height) {
+  const ctx = getAudio(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.01;
+  tone(ctx, { freq: 150, to: 70, start: t0, dur: 0.16, type: 'sine', vol: 0.28 });
+  const notes = [523.25, 659.25, 783.99, 1046.5];
+  for (let i = 0; i < height; i++) {
+    const t = t0 + (reduceMotion ? i * 0.07 : i * 0.13);
+    tone(ctx, { freq: notes[i] * 0.94, to: notes[i], start: t, dur: 0.14, type: 'triangle', vol: 0.15 });
+  }
+}
+// 철거: '철컹!' 금속 소리 + 우르르 부서지며 사라지는 소리
+let noiseBuf = null, crackleBuf = null;
+function getNoise(ctx) {
+  if (noiseBuf) return noiseBuf;
+  const len = Math.floor(ctx.sampleRate * 0.6);
+  noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const d = noiseBuf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  // 잔해가 부서지는 듯한 '자글자글' 소리 (작은 알갱이들)
+  crackleBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+  const c = crackleBuf.getChannelData(0);
+  let amp = 0;
+  for (let i = 0; i < len; i++) {
+    if (Math.random() < 0.004) amp = 0.4 + Math.random() * 0.6;
+    amp *= 0.993;
+    c[i] = (Math.random() * 2 - 1) * amp;
+  }
+  return noiseBuf;
+}
+function noiseHit(ctx, buf, { start, dur, vol, type, freq, freqTo, q = 1 }) {
+  const src = ctx.createBufferSource(); src.buffer = buf;
+  const f = ctx.createBiquadFilter(); f.type = type; f.Q.value = q;
+  f.frequency.setValueAtTime(freq, start);
+  if (freqTo) f.frequency.exponentialRampToValueAtTime(freqTo, start + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, start);
+  g.gain.exponentialRampToValueAtTime(vol, start + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+  src.connect(f).connect(g).connect(out(ctx));
+  src.start(start); src.stop(start + dur + 0.02);
+}
+let REMOVE_VOL = 0.45;  // 철거 소리 크기 (1 = 처음 크기) — 띠딕과 비슷하게
+function playRemoveSound(ctxOverride) {
+  const ctx = ctxOverride || getAudio(); if (!ctx) return;
+  getNoise(ctx);
+  const t0 = ctx.currentTime + 0.01;
+  // 1) 쿵 (무거운 충격)
+  tone(ctx, { freq: 130, to: 48, start: t0, dur: 0.2, type: 'sine', vol: 0.35 * REMOVE_VOL });
+  // 2) 철컹 (부딪치는 충격음만, 울리는 음 없이)
+  noiseHit(ctx, noiseBuf, { start: t0, dur: 0.06, vol: 0.4 * REMOVE_VOL, type: 'bandpass', freq: 2200, q: 2 });
+  noiseHit(ctx, noiseBuf, { start: t0 + 0.07, dur: 0.05, vol: 0.22 * REMOVE_VOL, type: 'bandpass', freq: 1500, q: 2 });
+  // 3) 우르르 (잔해가 부서지며 가라앉는 소리)
+  noiseHit(ctx, crackleBuf, { start: t0 + 0.05, dur: 0.45, vol: 0.5 * REMOVE_VOL, type: 'lowpass', freq: 3500, freqTo: 500, q: 0.7 });
+  noiseHit(ctx, noiseBuf, { start: t0 + 0.06, dur: 0.4, vol: 0.12 * REMOVE_VOL, type: 'lowpass', freq: 1200, freqTo: 180, q: 0.5 });
+}
+// 정답: 밝은 축하 팡파르 '딴-따-따-딴~' (약 1.3초)
+function playCelebrate(ctxOverride) {
+  const ctx = ctxOverride || getAudio(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.03;
+  // 멜로디: 솔-도-미-솔 → 높은 도(길게)
+  const mel = [[392.0, 0.00, 0.12], [523.25, 0.12, 0.12], [659.25, 0.24, 0.12], [783.99, 0.36, 0.14], [1046.5, 0.52, 0.75]];
+  mel.forEach(([f, at, d]) => {
+    tone(ctx, { freq: f, start: t0 + at, dur: d + 0.08, type: 'triangle', vol: 0.2 });
+    tone(ctx, { freq: f * 2, start: t0 + at, dur: d * 0.6 + 0.05, type: 'sine', vol: 0.05 });
+  });
+  // 마지막 음 아래 화음 (도-미-솔)
+  [523.25, 659.25, 783.99].forEach(f => tone(ctx, { freq: f, start: t0 + 0.52, dur: 0.8, type: 'sine', vol: 0.07 }));
+}
+// 다시 확인해 봐요: 부드러운 '띠딕' (살짝 내려가는 두 음, 부드러운 사인파)
+function playCheckAgain(ctxOverride) {
+  const ctx = ctxOverride || getAudio(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.02;
+  tone(ctx, { freq: 880, start: t0, dur: 0.09, type: 'sine', vol: 0.16 });
+  tone(ctx, { freq: 698.46, start: t0 + 0.11, dur: 0.13, type: 'sine', vol: 0.14 });
+}
+// 블록 부족: 짧은 '뚜뚜'
+function playDenySound() {
+  const ctx = getAudio(); if (!ctx) return;
+  const t0 = ctx.currentTime + 0.01;
+  tone(ctx, { freq: 220, start: t0, dur: 0.09, type: 'square', vol: 0.05 });
+  tone(ctx, { freq: 196, start: t0 + 0.12, dur: 0.12, type: 'square', vol: 0.05 });
+}
+const SPEAKER_ON = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#5c6bc0"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#5c6bc0" stroke-width="2" stroke-linecap="round"/></svg>';
+const SPEAKER_OFF = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#9e9e9e"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="#9e9e9e" stroke-width="2" stroke-linecap="round"/></svg>';
+function toggleSound() {
+  soundOn = !soundOn;
+  const btn = document.getElementById('sound-btn');
+  btn.innerHTML = soundOn ? SPEAKER_ON : SPEAKER_OFF;
+  btn.setAttribute('aria-label', soundOn ? (currentLang === 'ko' ? '소리 끄기' : 'Sound off') : (currentLang === 'ko' ? '소리 켜기' : 'Sound on'));
+}
+
+/* ---------- 입력 ---------- */
+function onPointerDown(e) {
+  isDragging = false;
+  startMouse.set(e.clientX, e.clientY);
+  setHover(null);
+}
+function pick(e) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+  mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(interactableObjects, false);
+  return hits.length ? hits[0].object : null;
+}
+function setHover(tile) {
+  if (hoveredTile === tile) return;
+  if (hoveredTile) hoveredTile.userData.topMat.emissive.setHex(0x000000);
+  hoveredTile = tile;
+  if (hoveredTile) hoveredTile.userData.topMat.emissive.setHex(0x3a3320);
+}
+function onPointerMove(e) {
+  if (e.buttons) {
+    if (Math.abs(e.clientX - startMouse.x) > 10 || Math.abs(e.clientY - startMouse.y) > 10) isDragging = true;
+    return;
+  }
+  if (e.pointerType !== 'mouse') return;
+  const obj = pick(e);
+  const canvas = renderer.domElement;
+  if (obj && obj.userData.type === 'tile' && state.grid[obj.userData.r][obj.userData.c] === 0) { setHover(obj); canvas.style.cursor = 'pointer'; }
+  else { setHover(null); canvas.style.cursor = obj && obj.userData.type === 'building' ? 'pointer' : 'grab'; }
+}
+function onPointerUp(e) {
+  if (isDragging) return;
+  const obj = pick(e);
+  if (!obj) return;
+  const { r, c, type } = obj.userData;
+  if (r === undefined) return;
+  const cellValue = state.grid[r][c];
+  if (cellValue > 0 && type === 'building') handleGridClick(r, c, type);
+  else if (cellValue === 0 && type === 'tile') handleGridClick(r, c, type);
+}
+
+function handleGridClick(r, c, type) {
+  const currentH = state.grid[r][c];
+  const targetH = state.selectedTool;
+  const t = translations[currentLang];
+  if (currentH === 0 && type === 'tile') {
+    if (state.inventory[targetH] > 0) {
+      state.inventory[targetH]--;
+      state.grid[r][c] = targetH;
+      setHover(null);
+      placeBuilding3D(r, c, targetH, true);
+      playBuildSound(targetH);
+    } else {
+      playDenySound();
+      showToast(`${t.msgNoBlock} (${targetH}${currentLang === 'ko' ? '층' : 'F'})`);
+    }
+  } else if (currentH > 0 && type === 'building') {
+    state.inventory[currentH]++;
+    state.grid[r][c] = 0;
+    removeBuilding3D(r, c, true);
+    playRemoveSound();
+    showToast(t.msgRemoved);
+  }
+  updateInventoryUI();
+}
+
+/* ---------- 인벤토리·메시지 ---------- */
+function selectTool(h) {
+  state.selectedTool = h;
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById(`tool-${i}`);
+    if (el) el.classList.toggle('selected', i === h);
+  }
+}
+document.querySelectorAll('.inv-item').forEach((el, i) => el.addEventListener('keydown', e => { if (e.key === 'Enter') selectTool(i + 1); }));
+function updateInventoryUI() {
+  const size = puzzles[state.levelIdx].size;
+  for (let i = 1; i <= size; i++) {
+    document.getElementById(`count-${i}`).innerText = state.inventory[i];
+    document.getElementById(`tool-${i}`).style.opacity = state.inventory[i] <= 0 ? 0.5 : 1;
+  }
+}
+let toastTimer = null;
+function showToast(text) {
+  const msg = document.getElementById('message');
+  msg.innerText = text; msg.style.color = '#ef5350';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { msg.innerText = ''; }, 1500);
+}
+
+/* ---------- 문제 이동·정답 확인 (원본 로직) ---------- */
+function changeLevel(delta) {
+  const newIdx = state.levelIdx + delta;
+  if (newIdx >= 0 && newIdx < puzzles.length) loadLevel(newIdx);
+}
+function resetGame() { loadLevel(state.levelIdx); }
+function countVisible(arr) { let max = 0, count = 0; for (const v of arr) { if (v > max) { max = v; count++; } } return count; }
+function checkAnswer() {
+  clearTimeout(toastTimer);
+  const puzzle = puzzles[state.levelIdx];
+  const size = puzzle.size;
+  const msg = document.getElementById('message');
+  const t = translations[currentLang];
+  for (let r = 0; r < size; r++) {
+    if (state.grid[r].includes(0)) { msg.innerText = t.msgIncomplete; msg.style.color = "#f57c00"; playCheckAgain(); return; }
+  }
+  for (let i = 0; i < size; i++) {
+    const rowSet = new Set(state.grid[i]);
+    const colArr = []; for (let r = 0; r < size; r++) colArr.push(state.grid[r][i]);
+    if (rowSet.size !== size || new Set(colArr).size !== size) { msg.innerText = t.msgDuplicate; msg.style.color = "#ef5350"; playCheckAgain(); return; }
+  }
+  let correct = true;
+  for (let r = 0; r < size; r++) {
+    const row = state.grid[r];
+    if (puzzle.clues.left[r] !== 0 && countVisible(row) !== puzzle.clues.left[r]) correct = false;
+    if (puzzle.clues.right[r] !== 0 && countVisible([...row].reverse()) !== puzzle.clues.right[r]) correct = false;
+  }
+  for (let c = 0; c < size; c++) {
+    const col = []; for (let r = 0; r < size; r++) col.push(state.grid[r][c]);
+    if (puzzle.clues.top[c] !== 0 && countVisible(col) !== puzzle.clues.top[c]) correct = false;
+    if (puzzle.clues.bottom[c] !== 0 && countVisible([...col].reverse()) !== puzzle.clues.bottom[c]) correct = false;
+  }
+  if (correct) { msg.innerText = t.msgCorrect; msg.style.color = "#2e7d32"; playCelebrate(); }
+  else { msg.innerText = t.msgWrong; msg.style.color = "#ef5350"; playCheckAgain(); }
+}
+
+/* ---------- 화면 크기 변경 ---------- */
+window.addEventListener('resize', () => {
+  if (renderer) {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+  if (state.mode === '2d' && document.getElementById('ui-layer').style.display !== 'none') render2D();
+});
+</script>
+</body>
+</html>
