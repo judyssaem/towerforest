@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Skyscrapers: 들쑥날쑥 빌딩 숲</title>
+<title>들쑥날쑥 빌딩 숲 | Skyscrapers</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
@@ -39,7 +39,10 @@ body {
   background-size: 20px 20px;
   color: var(--ink);
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
+.modal-content, #start-screen { touch-action: pan-y; }
 
 #ui-layer {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -119,8 +122,8 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   padding: 30px 60px; border-radius: 40px; border: 6px solid #90caf9;
   box-shadow: 0 10px 20px rgba(0,0,0,0.1);
 }
-.main-title { font-size: 3.5rem; color: #1565c0; margin: 0; line-height: 1.2; text-shadow: 2px 2px 0 #bbdefb; border: none; box-shadow: none; padding: 0; background: none; }
-.sub-title { font-size: 2.2rem; color: #5c6bc0; margin-top: 10px; display: block; }
+.main-title { text-align: center; font-size: 3.5rem; color: #1976d2; margin: 0; line-height: 1.2; text-shadow: 3px 3px 0 #bbdefb; border: none; box-shadow: none; padding: 0; background: none; }
+.sub-title { font-size: 1.9rem; color: #5c6bc0; margin-top: 8px; display: block; text-align: center; letter-spacing: 0.02em; }
 
 .mode-container { display: flex; gap: 30px; margin-bottom: 30px; }
 .mode-card {
@@ -129,7 +132,8 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   box-shadow: 0 10px 20px rgba(100,181,246,0.3);
   transition: transform 0.2s, border-color 0.2s;
 }
-.mode-card:hover { transform: scale(1.05); border-color: #64b5f6; }
+@media (hover: hover) { .mode-card:hover { transform: scale(1.05); border-color: #64b5f6; } }
+.mode-card:active { transform: scale(0.97); border-color: #64b5f6; }
 .mode-icon { display: block; width: 130px; height: 112px; margin: 0 auto 14px; overflow: visible; }
 .mode-title { font-size: 2rem; color: #1565c0; margin: 0; font-weight: bold; }
 .mode-desc { color: #777; font-size: 1rem; margin-top: 10px; word-break: keep-all; }
@@ -211,7 +215,7 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   border: 3px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s;
   background: #fafafa;
 }
-.inv-item:hover { transform: scale(1.05); }
+@media (hover: hover) { .inv-item:hover { transform: scale(1.05); } }
 .inv-item.selected { border-color: #2196F3; background-color: #e3f2fd; box-shadow: 0 3px 0 #90caf9; }
 .block-preview { width: 34px; height: 46px; flex-shrink: 0; display: block; }
 .block-info { display: flex; flex-direction: column; }
@@ -238,9 +242,9 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   .controls-area { width: 95%; gap: 5px; padding: 5px; bottom: calc(5px + env(safe-area-inset-bottom, 0px)); justify-content: center; box-sizing: border-box; }
   .controls-area button { padding: 8px 10px; font-size: 0.9rem; flex: 1 0 auto; }
   #inventory-sidebar { transform: scale(0.82) translateY(-60%); transform-origin: right center; right: 4px; border-width: 2px; padding: 10px; }
-  .main-title { font-size: 2.2rem; }
+  .main-title { font-size: 2rem; white-space: nowrap; }
   .sub-title { font-size: 1.4rem; }
-  .title-container { padding: 20px 30px; }
+  .title-container { padding: 18px 22px; }
   #start-screen { padding: calc(70px + env(safe-area-inset-top, 0px)) 12px 20px; box-sizing: border-box; justify-content: flex-start; overflow-y: auto; }
   .title-container { margin-bottom: 20px; }
   .mode-container { gap: 12px; width: 100%; max-width: 380px; margin-bottom: 20px; }
@@ -249,6 +253,16 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   .mode-icon { width: 92px; height: 80px; margin: 0 auto 8px; }
   .mode-title { font-size: 1.4rem; }
   .teacher-mark { font-size: 0.9rem; right: 15px; }
+}
+@media (orientation: portrait) and (min-width: 601px) {
+  #inventory-sidebar {
+    top: auto; right: auto; left: 50%;
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    flex-direction: row; align-items: center; gap: 10px; padding: 10px 14px;
+  }
+  .inv-header { display: none; }
+  .floor-name, .floor-count { white-space: nowrap; }
 }
 @media (max-width: 600px) {
   .controls-area { flex-wrap: wrap; gap: 5px; border-width: 3px; border-radius: 18px; }
@@ -277,8 +291,8 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   <button id="lang-btn" onclick="toggleLanguage()">English</button>
   <div class="teacher-mark">© 주디쌤</div>
   <div class="title-container">
-    <h1 class="main-title">Skyscrapers</h1>
-    <span class="sub-title" id="t-subtitle">들쑥날쑥 빌딩 숲 🏙️</span>
+    <h1 class="main-title" id="t-main-title">들쑥날쑥 빌딩 숲</h1>
+    <span class="sub-title" id="t-subtitle">Skyscrapers</span>
   </div>
   <div class="mode-container">
     <div class="mode-card" tabindex="0" onclick="startMode('3d')" onkeydown="if(event.key==='Enter')startMode('3d')">
@@ -401,7 +415,7 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
    ========================================================= */
 const translations = {
   ko: {
-    subtitle: "들쑥날쑥 빌딩 숲 🏙️", mode3dTitle: "블록 세계", mode3dDesc: "직접 건물을 지어봐요",
+    mainTitle: "들쑥날쑥 빌딩 숲", subtitle: "Skyscrapers", mode3dTitle: "블록 세계", mode3dDesc: "직접 건물을 지어봐요",
     mode2dTitle: "숫자 세계", mode2dDesc: "숫자로 문제를 해결해요", helpBtn: "놀이 방법",
     modalTitle: "🏙️ 스카이스크래퍼 놀이 방법",
     rule1Title: "1. 건물의 개수", rule1Desc: "3x3 판: 1, 2, 3층 건물이 각각 3개씩, 총 9개가 필요해요.<br>4x4 판: 1, 2, 3, 4층 건물이 각각 4개씩, 총 16개가 필요해요.",
@@ -416,7 +430,7 @@ const translations = {
     msgRemoved: "🗑️ 건물을 철거했습니다.", msgNoBlock: "🏗️ 블록이 부족해요!", langBtn: "English"
   },
   en: {
-    subtitle: "Building a City Skyline 🏙️", mode3dTitle: "Block World", mode3dDesc: "Build with blocks",
+    mainTitle: "Skyscrapers", subtitle: "Building a City Skyline", mode3dTitle: "Block World", mode3dDesc: "Build with blocks",
     mode2dTitle: "Number World", mode2dDesc: "Solve with numbers", helpBtn: "How to Play",
     modalTitle: "🏙️ How to Play Skyscrapers",
     rule1Title: "1. Number of Buildings", rule1Desc: "3x3 Board: 3 of each 1, 2, 3-story buildings (Total 9).<br>4x4 Board: 4 of each 1, 2, 3, 4-story buildings (Total 16).",
@@ -437,7 +451,7 @@ function toggleLanguage() { currentLang = currentLang === 'ko' ? 'en' : 'ko'; up
 function updateLanguage() {
   const t = translations[currentLang];
   const set = (id, v, html) => { const el = document.getElementById(id); if (html) el.innerHTML = v; else el.innerText = v; };
-  set('t-subtitle', t.subtitle); set('t-mode-3d-title', t.mode3dTitle); set('t-mode-3d-desc', t.mode3dDesc);
+  set('t-main-title', t.mainTitle); set('t-subtitle', t.subtitle); set('t-mode-3d-title', t.mode3dTitle); set('t-mode-3d-desc', t.mode3dDesc);
   set('t-mode-2d-title', t.mode2dTitle); set('t-mode-2d-desc', t.mode2dDesc); set('help-btn', t.helpBtn);
   set('lang-btn', t.langBtn); set('t-modal-title', t.modalTitle);
   set('t-rule-1-title', t.rule1Title); set('t-rule-1-desc', t.rule1Desc, true);
@@ -729,7 +743,8 @@ function init3D() {
   if (renderer) return;
   const canvas = document.getElementById('canvas-3d');
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const isTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, isTouch ? 1.5 : 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -785,25 +800,40 @@ function buildSky() {
   sun.position.set(150, 42, -250);
   scene.add(sun);
 
-  // 구름
+  // 구름: 가장자리가 부드럽게 번지는 그림 구름 (여러 모양을 미리 그려 둠)
   cloudGroup = new THREE.Group();
-  const cloudMat = new THREE.MeshLambertMaterial({ color: 0xffffff, emissive: 0x9aa9b8, fog: false });
-  const puff = new THREE.IcosahedronGeometry(1, 1);
   const rnd = seeded(7);
-  for (let i = 0; i < 9; i++) {
-    const cloud = new THREE.Group();
-    const n = 4 + Math.floor(rnd() * 3);
-    for (let j = 0; j < n; j++) {
-      const m = new THREE.Mesh(puff, cloudMat);
-      const s = 3.2 + rnd() * 3;
-      m.scale.set(s * 1.25, s * 0.8, s);
-      m.position.set((j - n / 2) * 4 + rnd() * 2, rnd() * 1.6, rnd() * 3 - 1.5);
-      cloud.add(m);
+  const cloudTex = [];
+  for (let v = 0; v < 3; v++) {
+    const [cc, cctx] = makeCanvas(512, 256);
+    const blobs = 7 + v * 2;
+    for (let j = 0; j < blobs; j++) {
+      const x = 110 + rnd() * 290, y = 120 + (rnd() - 0.5) * 50 - Math.sin((x - 110) / 290 * Math.PI) * 30;
+      const r = 55 + rnd() * 45;
+      const g = cctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, 'rgba(255,255,255,0.95)');
+      g.addColorStop(0.45, 'rgba(255,255,255,0.75)');
+      g.addColorStop(0.75, 'rgba(255,255,255,0.3)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      cctx.fillStyle = g;
+      cctx.beginPath(); cctx.arc(x, y, r, 0, Math.PI * 2); cctx.fill();
     }
-    const ang = (i / 9) * Math.PI * 2 + rnd() * 0.4;
-    const rad = 120 + rnd() * 60;
-    cloud.position.set(Math.sin(ang) * rad, 14 + rnd() * 16, -Math.cos(ang) * rad);
-    cloud.lookAt(0, cloud.position.y, 0);
+    // 아랫부분에 아주 옅은 하늘빛 그늘 → 입체감
+    const sh = cctx.createLinearGradient(0, 110, 0, 220);
+    sh.addColorStop(0, 'rgba(180,205,230,0)');
+    sh.addColorStop(1, 'rgba(180,205,230,0.25)');
+    cctx.globalCompositeOperation = 'source-atop';
+    cctx.fillStyle = sh; cctx.fillRect(0, 0, 512, 256);
+    cloudTex.push(new THREE.CanvasTexture(cc));
+  }
+  for (let i = 0; i < 10; i++) {
+    const mat = new THREE.SpriteMaterial({ map: cloudTex[i % 3], transparent: true, depthWrite: false, fog: false, opacity: 0.8 + rnd() * 0.2 });
+    const cloud = new THREE.Sprite(mat);
+    const w = 55 + rnd() * 45;
+    cloud.scale.set(w, w * 0.5, 1);
+    const ang = (i / 10) * Math.PI * 2 + rnd() * 0.4;
+    const rad = 140 + rnd() * 70;
+    cloud.position.set(Math.sin(ang) * rad, 18 + rnd() * 22, -Math.cos(ang) * rad);
     cloudGroup.add(cloud);
   }
   scene.add(cloudGroup);
@@ -932,7 +962,7 @@ function buildLights() {
   const sun = new THREE.DirectionalLight(0xfff3dc, 0.62);
   sun.position.set(7, 14, 9);
   sun.castShadow = true;
-  const small = window.innerWidth <= 768;
+  const small = window.innerWidth <= 768 || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
   sun.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
   const d = 11;
   Object.assign(sun.shadow.camera, { left: -d, right: d, top: d, bottom: -d, near: 1, far: 40 });
@@ -944,16 +974,22 @@ function buildLights() {
 /* ---------- 카메라 ---------- */
 function frameCamera(size) {
   const aspect = window.innerWidth / window.innerHeight;
-  const k = aspect < 1 ? Math.min(2.0, 1 / Math.pow(aspect, 0.85)) : 1;
+  const k = aspect < 1 ? Math.min(2.0, 1 / Math.pow(aspect, 0.7)) : 1;
   const target = size === 3 ? new THREE.Vector3(0, 2.2, 0.3) : new THREE.Vector3(0, 2.6, 0.3);
   if (aspect < 0.8) target.y -= 1.4 * k;
   const offset = size === 3 ? new THREE.Vector3(0, 4.0, 12.5) : new THREE.Vector3(0, 4.8, 15.2);
   offset.multiplyScalar(k);
+  // 터치로 돌리던 관성이 남아 있으면 새 문제에서 화면이 비틀어지므로 먼저 없앰
+  controls.enableDamping = false;
+  controls.update();
   camera.position.copy(target).add(offset);
   controls.target.copy(target);
   controls.maxDistance = size === 4 ? Math.max(24, offset.length() * 1.15) : Math.max(32, offset.length() * 1.6);
   controls.update();
+  controls.enableDamping = true;
+  lastFramedPortrait = aspect < 1;
 }
+let lastFramedPortrait = null;
 
 /* ---------- 퍼즐판 ---------- */
 function cellPos(size, idx) {
@@ -1300,6 +1336,13 @@ function playDenySound() {
 }
 const SPEAKER_ON = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#5c6bc0"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="#5c6bc0" stroke-width="2" stroke-linecap="round"/></svg>';
 const SPEAKER_OFF = '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="#9e9e9e"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="#9e9e9e" stroke-width="2" stroke-linecap="round"/></svg>';
+function unlockAudio() {
+  const ctx = getAudio(); if (!ctx) return;
+  const b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource();
+  src.buffer = b; src.connect(ctx.destination); src.start(0);
+  ['touchend', 'pointerup', 'click', 'keydown'].forEach(ev => document.removeEventListener(ev, unlockAudio, true));
+}
+['touchend', 'pointerup', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, unlockAudio, true));
 function toggleSound() {
   soundOn = !soundOn;
   const btn = document.getElementById('sound-btn');
@@ -1440,6 +1483,8 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    const portrait = window.innerWidth < window.innerHeight;
+    if (state.mode === '3d' && lastFramedPortrait !== null && portrait !== lastFramedPortrait) frameCamera(puzzles[state.levelIdx].size);
   }
   if (state.mode === '2d' && document.getElementById('ui-layer').style.display !== 'none') render2D();
 });
