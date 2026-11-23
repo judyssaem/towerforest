@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>카메라 세계 | 들쑥날쑥 빌딩 숲</title>
+<title>내 빌딩숲 확인하기 | 들쑥날쑥 빌딩 숲</title>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -35,6 +35,9 @@ button { font-family: inherit; cursor: pointer; }
   text-shadow: 2px 2px 0 #c5cae9; }
 .round-btn { background: #fff; border: 3px solid var(--main); color: var(--main); border-radius: 40px;
   padding: 6px 14px; font-size: 1.05rem; white-space: nowrap; }
+.ico { width: 1.15em; height: 1.15em; flex: none; }
+.round-btn.has-ico { display: inline-flex; align-items: center; gap: .35em; }
+.top h1 .ico { width: 1.05em; height: 1.05em; vertical-align: -.14em; margin-right: .3em; }
 
 /* ---------- 문제 고르기 ---------- */
 #pick { overflow-y: auto; }
@@ -95,8 +98,8 @@ button { font-family: inherit; cursor: pointer; }
 <!-- 1. 문제 고르기 -->
 <section id="pick" class="screen on">
   <div class="top">
-    <button class="round-btn" onclick="location.href='index.html'">🏠 처음으로</button>
-    <h1>📷 카메라 세계</h1>
+    <button class="round-btn has-ico" onclick="location.href='index.html'"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5.5h4V20"/></svg>처음으로</button>
+    <h1><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5h3.5L8.5 5.5h7l2 3H21V19H3z"/><circle cx="12" cy="13.5" r="3.6"/></svg>내 빌딩숲 확인하기</h1>
     <span style="width:40px"></span>
   </div>
   <p class="pick-guide">활동 카드의 문제 번호를 눌러요</p>

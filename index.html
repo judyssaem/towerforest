@@ -92,7 +92,8 @@ button {
 button:active { transform: translateY(5px); box-shadow: none; }
 button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outline: 3px solid #1565c0; outline-offset: 3px; }
 
-.btn-home { background-color: #78909c; }
+.btn-home { background-color: #78909c; display: inline-flex; align-items: center; justify-content: center; gap: .35em; }
+.btn-home .ico { width: 1.15em; height: 1.15em; flex: none; }
 .btn-prev { background-color: #ffb74d; }
 .btn-next { background-color: #42a5f5; }
 .btn-check { background-color: #66bb6a; }
@@ -170,10 +171,11 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
 
 /* ---------- 숫자 세계(2D) ---------- */
 #game-2d-container {
-  display: none; pointer-events: auto; flex: none; margin-top: 5px;
+  display: none; pointer-events: auto; flex: 1 1 auto; min-height: 0; margin-top: 5px;
   align-items: center; justify-content: center; width: 100%; z-index: 10;
-  overflow-x: auto;
+  overflow: hidden;
 }
+#game-2d-container .game-board-2d { flex: none; transform-origin: center center; }
 .game-board-2d {
   display: grid; background-color: white; border-radius: 20px;
   border: 5px solid #b39ddb; box-shadow: 0 8px 0 #9575cd;
@@ -285,279 +287,287 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   .count-num { font-size: 0.8rem; }
 }
 
-/* ================= 초등 에듀테크 첫 화면 (홈 전용) ================= */
-#start-screen{display:flex;position:absolute;inset:0;z-index:100;overflow-x:hidden;overflow-y:auto;touch-action:pan-y;justify-content:flex-start;align-items:center;box-sizing:border-box;padding:clamp(68px,8vh,95px) 16px 94px;background:linear-gradient(180deg,#97d9f8 0%,#ccebf0 28%,#ffe9c3 61%,#ffdbaf 100%);isolation:isolate}
-#start-screen .home-decor{position:absolute;inset:0;min-height:100%;overflow:hidden;pointer-events:none;z-index:0}
-#start-screen .home-content{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:min(100%,1030px);margin:0 auto;gap:clamp(18px,3vh,29px)}
-#start-screen .home-header{margin:0 0 clamp(28px,5vh,58px);text-align:center;width:100%}
-#start-screen .home-logo{margin:0;padding:0;background:none;border:0;box-shadow:none;font-family:'Jua',sans-serif;font-size:clamp(2.6rem,7vw,6.1rem);font-weight:400;line-height:1.13;color:white;letter-spacing:-.055em;white-space:nowrap;-webkit-text-stroke:clamp(3px,.55vw,7px) #e94369;paint-order:stroke fill;text-shadow:0 4px 0 #d9355a,3px 6px 0 #fff,-3px 6px 0 #fff,0 8px 14px rgba(213,76,100,.18);filter:drop-shadow(0 0 2px white)}
-#start-screen .home-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-#start-screen .home-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(12px,2vw,28px);width:100%}
-#start-screen .home-play{position:relative;display:flex;flex-direction:column;justify-content:space-between;align-items:center;width:100%;min-width:0;aspect-ratio:1.09/1;padding:clamp(23px,3vw,38px) clamp(10px,2.7vw,28px) clamp(12px,2vw,23px);border:clamp(5px,.8vw,9px) solid #fff;border-radius:clamp(29px,5vw,64px);background:linear-gradient(160deg,#fff 25%,#fffefb 100%);box-shadow:0 9px 0 rgba(242,156,128,.3),0 15px 25px rgba(201,118,101,.15);font-family:'Jua',sans-serif;color:#1150a5;cursor:pointer;transition:transform .18s,box-shadow .18s;-webkit-tap-highlight-color:transparent}
-#start-screen .home-block{outline:clamp(4px,.55vw,7px) solid #52c9f4;outline-offset:-15px}
-#start-screen .home-number{outline:clamp(4px,.55vw,7px) solid #ffc931;outline-offset:-15px}
-#start-screen .home-play:hover{transform:translateY(-3px);box-shadow:0 13px 0 rgba(242,156,128,.23),0 19px 28px rgba(201,118,101,.18)}
-#start-screen .home-play:active{transform:translateY(3px)}
-#start-screen .home-bubble{position:absolute;top:-32px;left:clamp(17px,4vw,43px);z-index:2;transform:rotate(-8deg);border:5px solid white;background:#f6547e;color:white;border-radius:40px 40px 36px 30px;box-shadow:0 4px 0 rgba(204,76,110,.16);font-size:clamp(19px,3vw,32px);padding:8px clamp(11px,2.5vw,23px);line-height:1.25}
-#start-screen .home-bubble:after{content:'';position:absolute;right:16px;bottom:-16px;border-top:18px solid #f6547e;border-left:18px solid transparent}
-#start-screen .home-play-art{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;width:100%;padding:5% 2% 0}
-#start-screen .home-play-art svg{display:block;max-width:100%;max-height:100%;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 3px 1px rgba(63,117,163,.06))}
-#start-screen .home-number .home-play-art svg{max-width:80%}
-#start-screen .home-play-label{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:4px;width:100%;min-height:clamp(45px,6.5vw,75px);border-radius:999px;background:#a8dffc;padding:6px 10px;color:#164ca7;font-size:clamp(18px,3vw,36px);line-height:1;white-space:nowrap}
-#start-screen .home-number .home-play-label{background:#ffe484}
-#start-screen .home-go{display:flex;align-items:center;justify-content:center;flex:0 0 clamp(25px,3.9vw,44px);height:clamp(25px,3.9vw,44px);border-radius:50%;background:#1a61c6;color:white;font-family:Arial,sans-serif;font-weight:bold;font-size:clamp(25px,3.8vw,46px);line-height:1;transform:translateY(-1px)}
-#start-screen .home-camera{box-sizing:border-box;display:grid;grid-template-columns:minmax(90px,32%) minmax(0,1fr) clamp(30px,5.8vw,62px);align-items:center;gap:clamp(7px,1.4vw,17px);width:100%;min-height:clamp(112px,16vw,190px);padding:clamp(9px,1.6vw,19px) clamp(10px,2vw,28px);text-decoration:none;border:clamp(5px,.8vw,9px) solid #fff;outline:clamp(4px,.6vw,7px) solid #fb7e9c;outline-offset:-14px;border-radius:clamp(31px,7vw,85px);background:#fff;box-shadow:0 9px 0 rgba(236,143,128,.25),0 15px 25px rgba(201,118,101,.15);transition:transform .18s;color:#172f52}
-#start-screen .home-camera:hover{transform:translateY(-2px)}
-#start-screen .home-camera:active{transform:translateY(2px)}
-#start-screen .home-camera-art{display:flex;align-items:center;justify-content:center;height:100%;padding-right:clamp(4px,1vw,16px);border-right:3px solid #f3a4b7;min-height:70px}
-#start-screen .home-camera-art svg{width:100%;max-height:150px}
-#start-screen .home-camera-content{display:flex;flex-direction:column;align-items:flex-start;gap:clamp(3px,.7vw,8px);min-width:0}
-#start-screen .home-camera-title{color:#e93064;font-size:clamp(21px,3.8vw,47px);line-height:1.2;letter-spacing:-.04em;white-space:nowrap}
-#start-screen .home-camera-desc{color:#162c49;font-size:clamp(12px,1.9vw,25px);line-height:1.24;letter-spacing:-.025em}
-#start-screen .home-camera-go{display:flex;align-items:center;justify-content:center;width:clamp(29px,5.3vw,58px);aspect-ratio:1;border-radius:50%;background:#f45d83;color:#fff;font-family:Arial,sans-serif;font-size:clamp(28px,5.5vw,57px);font-weight:bold;line-height:1}
-#start-screen .home-help{display:flex;align-items:center;justify-content:center;gap:15px;margin:4px auto 0;background:#fff;border:4px solid #fff;color:#1653a3;border-radius:999px;padding:clamp(8px,1.5vw,15px) clamp(20px,4vw,47px);box-shadow:0 6px 0 #eab481,0 9px 15px rgba(177,118,84,.21);font-size:clamp(20px,2.8vw,32px);font-family:'Jua',sans-serif}
-#start-screen .home-help-icon{display:flex;align-items:center;justify-content:center;width:clamp(27px,3.5vw,40px);aspect-ratio:1;background:#2262c5;color:white;border-radius:50%;line-height:1;font-size:1em}
-#start-screen .home-help:active{transform:translateY(3px);box-shadow:0 3px 0 #eab481}
-#start-screen .home-skyline{position:absolute;top:23%;left:0;width:100%;height:42%;opacity:.87}
-#start-screen .home-cloud{position:absolute;width:95px;height:30px;background:#e8f6fa;border-radius:60px;opacity:.83}
-#start-screen .home-cloud:before,#start-screen .home-cloud:after{content:'';position:absolute;border-radius:50%;background:inherit}
-#start-screen .home-cloud:before{width:46px;height:44px;left:19px;bottom:9px}
-#start-screen .home-cloud:after{width:42px;height:38px;left:50px;bottom:1px}
-#start-screen .cloud-a{left:2%;top:5%}#start-screen .cloud-b{left:47%;top:13%;transform:scale(.65)}#start-screen .cloud-c{right:2%;top:4%;transform:scale(1.05)}
-#start-screen .home-airplane{position:absolute;right:4%;top:13%;width:clamp(110px,19vw,220px)}
-#start-screen .home-tower{position:absolute;left:1.5%;top:18%;height:clamp(160px,33vh,290px);max-width:8vw}
-#start-screen .home-beach-left{position:absolute;left:0;bottom:0;width:clamp(135px,20vw,240px)}
-#start-screen .home-beach-right{position:absolute;right:0;bottom:0;width:clamp(130px,19vw,230px)}
-#start-screen .home-wave{position:absolute;bottom:0;left:0;right:0;height:32px;background:radial-gradient(circle at 18px -1px,#fff 17px,transparent 18px) repeat-x 0 0/36px 24px,linear-gradient(#ffcf91,#ffcf91);background-position:0 0,0 23px;background-size:36px 24px,100% 100%;pointer-events:none}
-#start-screen #lang-btn{top:calc(10px + env(safe-area-inset-top,0px));left:12px;font-size:clamp(12px,1.2vw,16px);padding:7px 12px;border-radius:13px;box-shadow:0 3px 0 #3949ab}
-#start-screen .teacher-mark{top:calc(15px + env(safe-area-inset-top,0px));right:14px;font-size:clamp(12px,1.2vw,16px)}
-#start-screen button:focus-visible,#start-screen a:focus-visible{outline:4px solid #114dc6;outline-offset:4px}
-@media(max-width:700px){
- #start-screen{padding:clamp(75px,12vh,104px) 10px 85px;align-items:stretch}
- #start-screen .home-content{gap:19px}
- #start-screen .home-header{margin:0 0 clamp(36px,7vh,65px)}
- #start-screen .home-logo{font-size:clamp(29px,7.2vw,50px);-webkit-text-stroke:3px #e94369;letter-spacing:-.065em}
- #start-screen .home-play{aspect-ratio:.91/1;border-width:5px;border-radius:27px;padding:24px 6px 9px;outline-offset:-10px}
- #start-screen .home-block,#start-screen .home-number{outline-width:3px}
- #start-screen .home-bubble{top:-19px;left:10px;border-width:3px;font-size:clamp(16px,4.2vw,23px);padding:5px 11px}
- #start-screen .home-bubble:after{bottom:-11px;border-top-width:12px;border-left-width:12px}
- #start-screen .home-play-art{padding:5px 0 0}
- #start-screen .home-number .home-play-art svg{max-width:89%}
- #start-screen .home-play-label{font-size:clamp(17px,4vw,25px);min-height:40px;padding:4px 3px;letter-spacing:-.08em}
- #start-screen .home-go{flex-basis:25px;height:25px;font-size:29px}
- #start-screen .home-camera{gap:7px;grid-template-columns:29% minmax(0,1fr) 26px;padding:11px 10px;min-height:106px;border-width:5px;outline-width:3px;outline-offset:-10px}
- #start-screen .home-camera-title{font-size:clamp(17px,4.2vw,28px);letter-spacing:-.06em}
- #start-screen .home-camera-desc{font-size:clamp(10px,2.5vw,16px);line-height:1.25}
- #start-screen .home-camera-art{border-right-width:2px}
- #start-screen .home-camera-go{width:25px;font-size:30px}
- #start-screen .home-skyline{top:25%;height:37%}
- #start-screen .home-airplane{top:15%;right:2%}
- #start-screen .home-tower{top:21%;height:170px}
- #start-screen .teacher-mark{font-size:11px}
+/* ================= 첫 화면 · towerforest-home 에셋 디자인 ================= */
+#start-screen.tf-home{
+  --S:min(100vw,100vh);
+  --navy:#0d2b5e;
+  --pink:#ef3f6a;
+  --blue:#35b2f0;
+  --yellow:#ffc928;
+  position:absolute;inset:0;z-index:100;
+  display:flex;flex-direction:column;align-items:center;justify-content:safe center;
+  padding:calc(var(--S)*.035) 16px calc(var(--S)*.06);
+  box-sizing:border-box;
+  overflow-x:hidden;overflow-y:auto;
+  touch-action:pan-y;
+  isolation:isolate;
+  font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  color:var(--navy);
+  background:linear-gradient(180deg,#9de0fb 0%,#a6e2f8 22%,#ffe7d6 33%,#ffc2b0 42%,#ffd2b8 55%,#ffdfbd 80%,#fbd79c 100%);
 }
-@media(max-width:360px){#start-screen .home-logo{font-size:27px}#start-screen .home-camera-title{font-size:17px}#start-screen .home-camera-desc{font-size:9.5px}}
-@media(max-height:660px) and (min-width:701px){#start-screen{padding-top:48px;padding-bottom:62px}#start-screen .home-header{margin-bottom:15px}#start-screen .home-content{max-width:780px;gap:14px}#start-screen .home-play{aspect-ratio:1.5/1}#start-screen .home-camera{min-height:98px}#start-screen .home-logo{font-size:60px}}
-@media(prefers-reduced-motion:reduce){#start-screen .home-play,#start-screen .home-camera{transition:none}}
+@supports (height:100svh){#start-screen.tf-home{--S:min(100vw,100svh)}}
 
+/* 배경: 정사각 일러스트를 높이에 맞추고 좌우는 그라데이션으로 이어 붙임 */
+.tf-bg,.tf-bg-beach{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.tf-bg{
+  background:url("assets/home/background/coastal-city.png") center bottom/auto 100% no-repeat;
+  -webkit-mask-image:linear-gradient(90deg,transparent calc(50% - 50vh),#000 calc(50% - 38vh),#000 calc(50% + 38vh),transparent calc(50% + 50vh));
+          mask-image:linear-gradient(90deg,transparent calc(50% - 50vh),#000 calc(50% - 38vh),#000 calc(50% + 38vh),transparent calc(50% + 50vh));
+}
+.tf-bg-beach{display:none}
 
-/* 2026-11-23 Home visual refinement: fixed text outlines, block stacks and responsive scale. */
-#start-screen{
-  padding:clamp(44px,6vh,72px) clamp(14px,2vw,32px) clamp(42px,6vh,70px);
-  background:linear-gradient(to bottom,#9edcf7 0%,#cceaf1 27%,#fce9d6 47%,#ffe0b6 100%);
+/* 상단 보조 버튼 */
+#start-screen.tf-home #lang-btn{
+  position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:14px;z-index:5;
+  padding:7px 16px;border-radius:999px;
+  background:#fff;color:#3f51b5;font-size:clamp(13px,1.3vw,17px);
+  border:3px solid #c5cae9;box-shadow:0 3px 0 #9fa8da;
 }
-#start-screen .home-content{
-  width:min(96%,1320px);
-  max-width:none;
-  gap:clamp(12px,2.3vh,22px);
-}
-#start-screen .home-header{margin-bottom:clamp(19px,4vh,38px)}
-#start-screen .home-logo{
-  font-family:'Jua','Malgun Gothic',sans-serif;
-  font-weight:400;
-  font-size:clamp(44px,5.5vw,90px);
-  color:#fff;
-  letter-spacing:-.035em;
-  line-height:1.25;
-  -webkit-text-stroke:clamp(3px,.43vw,6px) #eb416b;
-  paint-order:stroke fill;
-  text-shadow:0 3px 0 #d93860;
-  filter:none;
-}
-#start-screen .home-cards{gap:clamp(13px,2vw,26px)}
-#start-screen .home-play{
-  aspect-ratio:1.38/1;
-  max-height:clamp(255px,42vh,405px);
-  padding-top:clamp(22px,3vh,34px);
-  padding-bottom:clamp(12px,1.7vh,18px);
-}
-#start-screen .home-play-art{padding:3px 8px 0;overflow:visible}
-#start-screen .home-play-art svg{height:100%;width:100%;max-height:clamp(178px,29vh,285px)}
-#start-screen .home-number .home-play-art svg{max-width:75%}
-#start-screen .home-play-label{min-height:clamp(51px,7vh,69px);font-size:clamp(23px,2.55vw,34px);letter-spacing:-.01em}
-#start-screen .home-camera{min-height:clamp(105px,17vh,157px);padding:clamp(8px,1.2vh,16px) clamp(13px,1.7vw,23px)}
-#start-screen .home-camera-art svg{max-height:clamp(83px,13vh,135px)}
-#start-screen .home-camera-title{font-size:clamp(26px,3vw,41px)}
-#start-screen .home-camera-desc{font-size:clamp(15px,1.7vw,23px)}
-#start-screen .home-help{padding:clamp(7px,1vh,12px) clamp(22px,3vw,40px);font-size:clamp(20px,2.3vw,29px)}
-#start-screen .home-skyline{top:29%;height:40%;opacity:.56}
-#start-screen .home-tower{top:25%;max-width:6vw}
-#start-screen .home-beach-left,#start-screen .home-beach-right{max-height:16vh}
-@media (min-width:1100px) and (max-height:780px){
-  #start-screen{padding-top:30px;padding-bottom:36px}
-  #start-screen .home-header{margin-bottom:13px}
-  #start-screen .home-logo{font-size:clamp(48px,5vw,72px)}
-  #start-screen .home-play{max-height:36vh;aspect-ratio:1.6/1}
-  #start-screen .home-play-art svg{max-height:25vh}
-  #start-screen .home-camera{min-height:95px}
-  #start-screen .home-content{gap:12px}
-}
-@media(max-width:700px){
-  #start-screen{padding:clamp(81px,12vh,105px) 10px 68px}
-  #start-screen .home-content{width:100%;gap:17px}
-  #start-screen .home-header{margin-bottom:clamp(35px,6vh,58px)}
-  #start-screen .home-logo{font-size:clamp(28px,7.1vw,47px);line-height:1.3;-webkit-text-stroke:2.6px #e94369;text-shadow:0 2px 0 #d93860}
-  #start-screen .home-play{aspect-ratio:.91/1;max-height:none;padding:23px 6px 9px}
-  #start-screen .home-play-art{padding:3px 0}
-  #start-screen .home-play-art svg{max-height:100%}
-  #start-screen .home-number .home-play-art svg{max-width:89%}
-  #start-screen .home-play-label{min-height:42px;font-size:clamp(17px,4.1vw,25px)}
-  #start-screen .home-camera{min-height:107px}
-  #start-screen .home-camera-title{font-size:clamp(17px,4.1vw,26px)}
-  #start-screen .home-camera-desc{font-size:clamp(10px,2.6vw,15px)}
-  #start-screen .home-help{font-size:clamp(18px,4.7vw,25px)}
-  #start-screen .home-tower{max-width:12vw;top:24%}
-  #start-screen .home-skyline{top:30%;opacity:.38}
+#start-screen.tf-home #lang-btn:active{transform:translateY(3px);box-shadow:none}
+#start-screen.tf-home .teacher-mark{
+  position:absolute;top:calc(18px + env(safe-area-inset-top,0px));right:16px;z-index:5;
+  font-size:clamp(12px,1.2vw,16px);color:#3f51b5;
+  background:rgba(255,255,255,.7);padding:4px 10px;border-radius:999px;
 }
 
-/* Home image assets · final illustrated design. Game UI stays interactive. */
-#start-screen{
-  background-color:#a9e0f2;
-  background-image:url("assets/home-background-desktop.png");
-  background-position:center center;
-  background-repeat:no-repeat;
-  background-size:cover;
-  padding-top:clamp(22px,4vh,47px);
-  padding-bottom:clamp(28px,4vh,45px);
+/* 레이아웃 */
+.tf-content{
+  width:calc(var(--S)*.9);max-width:1180px;
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);box-sizing:border-box;
+  gap:calc(var(--S)*.03) calc(var(--S)*.022);
+  justify-items:center;
 }
-#start-screen .home-decor{display:none!important}
-#start-screen .home-content{width:min(96%,1320px);gap:clamp(12px,1.7vh,18px)}
-#start-screen .home-header{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:clamp(100px,19vh,168px);
-  margin:0 0 clamp(12px,2vh,24px);
+.tf-header{grid-column:1/-1;margin:0 0 calc(var(--S)*.04);text-align:center;width:100%}
+.tf-logo-img{display:block;width:calc(var(--S)*.68);max-width:100%;height:auto;margin:0 auto;
+  filter:drop-shadow(0 4px 6px rgba(214,64,101,.18))}
+.tf-logo-text{display:none;margin:0;padding:0;background:none;border:0;box-shadow:none;
+  font-family:'Jua',sans-serif;font-weight:400;font-size:calc(var(--S)*.085);line-height:1.15;
+  color:#fff;-webkit-text-stroke:calc(var(--S)*.008) #e7426e;paint-order:stroke fill;
+  text-shadow:0 5px 0 #d9355a;letter-spacing:-.02em}
+#start-screen.home-english .tf-logo-img{display:none}
+#start-screen.home-english .tf-logo-text{display:block}
+.tf-pill,.tf-banner-title,.tf-help,.tf-badge{-webkit-text-stroke:.6px currentColor}
+.tf-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* 놀이 카드 */
+#start-screen .tf-card{
+  --line:var(--blue);--pill:#c4e6fc;
+  position:relative;width:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  gap:calc(var(--S)*.015);
+  aspect-ratio:1/.93;
+  padding:calc(var(--S)*.045) calc(var(--S)*.025) calc(var(--S)*.025);
+  box-sizing:border-box;
+  background:linear-gradient(180deg,#fff 0%,#f6fbff 100%);
+  border:calc(var(--S)*.006) solid var(--line);
+  border-radius:calc(var(--S)*.055);
+  box-shadow:0 0 0 calc(var(--S)*.008) #fff,0 calc(var(--S)*.012) calc(var(--S)*.022) rgba(234,138,54,.32);
+  color:var(--navy);font:inherit;cursor:pointer;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s;
+  touch-action:manipulation;
 }
-#start-screen .home-logo-image{
-  display:block;
-  width:min(95%,960px);
-  height:auto;
-  max-height:clamp(112px,18vh,170px);
-  object-fit:contain;
-  margin:0 auto;
-  flex:none;
-  filter:drop-shadow(0 2px 2px rgba(214,64,101,.06));
+#start-screen .tf-card--numbers{--line:var(--yellow);--pill:#ffe38c;background:linear-gradient(180deg,#fff 0%,#fffbf1 100%)}
+.tf-badge{
+  position:absolute;top:calc(var(--S)*-.04);left:calc(var(--S)*.03);
+  padding:calc(var(--S)*.008) calc(var(--S)*.022);
+  background:var(--pink);color:#fff;
+  font-size:calc(var(--S)*.032);line-height:1.25;white-space:nowrap;
+  border:calc(var(--S)*.005) solid #fff;border-radius:999px;
+  box-shadow:0 calc(var(--S)*.004) calc(var(--S)*.01) rgba(200,40,80,.3);
+  transform:rotate(-6deg);transform-origin:left bottom;
 }
-#start-screen .home-logo{display:none}
-#start-screen.home-english .home-logo-image{display:none}
-#start-screen.home-english .home-logo{
-  display:block;
-  background:transparent;
-  box-shadow:none;
-  border:0;
-  padding:0;
-  margin:0;
-  font-family:'Jua',sans-serif;
-  font-size:clamp(42px,5.7vw,86px);
-  font-weight:400;
-  color:#FFFFFF;
-  -webkit-text-stroke:clamp(3px,.4vw,6px) #E7426E;
-  paint-order:stroke fill;
-  text-shadow:none;
-  filter:none;
-  line-height:1.25;
+.tf-badge::after{
+  content:"";position:absolute;left:62%;bottom:calc(var(--S)*-.016);
+  border-top:calc(var(--S)*.018) solid var(--pink);border-left:calc(var(--S)*.014) solid transparent;
+  filter:drop-shadow(0 calc(var(--S)*.004) 0 #fff);
 }
-#start-screen .home-play{
-  max-height:min(370px,39vh);
-  aspect-ratio:1.45/1;
+.tf-art{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center}
+.tf-art img{display:block;max-width:100%;max-height:100%;object-fit:contain;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.tf-card--blocks .tf-art img{width:88%}
+.tf-art .tf-grid{display:block;height:94%;width:auto;max-width:100%;aspect-ratio:1/1;
+  filter:drop-shadow(0 3px 4px rgba(20,40,80,.12));transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+#start-screen .tf-card:hover .tf-grid{transform:scale(1.05)}
+.tf-pill{
+  display:flex;align-items:center;justify-content:center;gap:calc(var(--S)*.014);
+  width:100%;box-sizing:border-box;
+  padding:calc(var(--S)*.012) calc(var(--S)*.02);
+  background:var(--pill);border-radius:999px;
+  font-size:calc(var(--S)*.042);line-height:1.1;letter-spacing:-.02em;white-space:nowrap;color:#0f3f91;
 }
-#start-screen .home-play-art svg{max-height:min(252px,28vh)}
-#start-screen .home-camera{min-height:clamp(96px,15vh,145px)}
-@media(min-width:1100px) and (max-height:790px){
-  #start-screen{padding-top:15px;padding-bottom:25px}
-  #start-screen .home-header{min-height:100px;margin-bottom:5px}
-  #start-screen .home-logo-image{max-height:100px}
-  #start-screen .home-content{gap:10px}
-  #start-screen .home-play{max-height:34vh;aspect-ratio:1.7/1}
-  #start-screen .home-play-art svg{max-height:24vh}
-  #start-screen .home-camera{min-height:90px}
+#start-screen.home-english .tf-pill{font-size:calc(var(--S)*.031)}
+.tf-pill img,.tf-banner-go{flex:none;transition:transform .2s}
+.tf-pill img{width:calc(var(--S)*.044);height:auto}
+
+/* 내 빌딩숲 확인하기 배너 */
+#start-screen .tf-banner{
+  grid-column:1/-1;width:100%;box-sizing:border-box;
+  display:grid;grid-template-columns:auto 2px minmax(0,1fr) auto;align-items:center;
+  gap:calc(var(--S)*.03);
+  padding:calc(var(--S)*.022) calc(var(--S)*.04);
+  background:#fffbfc;
+  border:calc(var(--S)*.006) solid #ff8fae;border-radius:calc(var(--S)*.08);
+  box-shadow:0 0 0 calc(var(--S)*.008) #fff,0 calc(var(--S)*.012) calc(var(--S)*.022) rgba(234,138,54,.3);
+  color:var(--navy);text-decoration:none;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1);
 }
-@media(max-width:700px){
-  #start-screen{
-    background-image:url("assets/home-background-mobile.png");
-    background-position:center center;
-    background-size:cover;
-    padding:clamp(68px,11vh,96px) 10px 68px;
+.tf-banner-art{position:relative;display:flex;align-items:center;gap:calc(var(--S)*.012)}
+.tf-camera{width:calc(var(--S)*.115);height:auto;transform:rotate(-6deg);transition:transform .3s}
+.tf-photo{
+  position:relative;display:flex;align-items:flex-end;justify-content:center;
+  width:calc(var(--S)*.15);aspect-ratio:1.25/1;box-sizing:border-box;
+  padding:calc(var(--S)*.012);
+  background:linear-gradient(180deg,#d9f1ff,#fff 85%);
+  border:calc(var(--S)*.005) solid #fff;border-radius:calc(var(--S)*.012);
+  box-shadow:0 0 0 2px #cfd8e3,0 calc(var(--S)*.006) calc(var(--S)*.012) rgba(30,60,110,.18);
+  transform:rotate(5deg);
+}
+.tf-photo img{width:100%;height:auto}
+.tf-photo .tf-check{position:absolute;right:calc(var(--S)*-.022);bottom:calc(var(--S)*-.018);width:calc(var(--S)*.058);height:auto;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.tf-divider{align-self:stretch;margin:calc(var(--S)*.012) 0;background:#ffb6c8;border-radius:2px}
+.tf-banner-copy{display:flex;flex-direction:column;gap:calc(var(--S)*.008);text-align:left;min-width:0}
+.tf-banner-title{font-size:calc(var(--S)*.05);line-height:1.1;color:#e8335f;letter-spacing:-.02em}
+.tf-banner-desc{font-size:calc(var(--S)*.026);line-height:1.4;color:var(--navy);word-break:keep-all}
+.tf-banner-go{width:calc(var(--S)*.06);height:auto}
+#start-screen.home-english .tf-banner-desc br{display:none}
+
+/* 놀이 방법 */
+#start-screen .tf-help{
+  grid-column:1/-1;
+  display:inline-flex;align-items:center;gap:calc(var(--S)*.016);
+  padding:calc(var(--S)*.014) calc(var(--S)*.05);
+  background:#fffdf8;color:var(--navy);
+  font-size:calc(var(--S)*.04);line-height:1.1;
+  border:calc(var(--S)*.004) solid #ffe2bd;border-radius:999px;
+  box-shadow:0 calc(var(--S)*.007) 0 #e9a35c,0 calc(var(--S)*.012) calc(var(--S)*.02) rgba(234,138,54,.3);
+  transition:transform .15s,box-shadow .15s;
+}
+.tf-help img{width:calc(var(--S)*.045);height:auto}
+
+/* 상호작용 */
+#start-screen .tf-card:focus-visible,#start-screen .tf-banner:focus-visible,#start-screen .tf-help:focus-visible,#start-screen #lang-btn:focus-visible{
+  outline:4px solid #114dc6;outline-offset:6px}
+@media (hover:hover){
+  #start-screen .tf-card:hover{transform:translateY(-6px) rotate(-.4deg)}
+  #start-screen .tf-card--numbers:hover{transform:translateY(-6px) rotate(.4deg)}
+  #start-screen .tf-card:hover .tf-art img{transform:scale(1.05)}
+  #start-screen .tf-card:hover .tf-pill img,#start-screen .tf-banner:hover .tf-banner-go{transform:translateX(4px)}
+  #start-screen .tf-banner:hover{transform:translateY(-4px)}
+  #start-screen .tf-banner:hover .tf-camera{transform:rotate(4deg) scale(1.06)}
+  #start-screen .tf-help:hover{transform:translateY(-3px)}
+}
+#start-screen .tf-card:active,#start-screen .tf-banner:active{transform:scale(.97)}
+#start-screen .tf-help:active{transform:translateY(calc(var(--S)*.007));box-shadow:0 0 0 #e9a35c}
+
+/* 등장 애니메이션 */
+@keyframes tf-pop{0%{opacity:0;transform:translateY(24px) scale(.92)}70%{opacity:1;transform:translateY(-4px) scale(1.02)}100%{opacity:1;transform:none}}
+@keyframes tf-drop{0%{opacity:0;transform:translateY(-30px) scale(.9)}65%{opacity:1;transform:translateY(5px) scale(1.03)}100%{opacity:1;transform:none}}
+@keyframes tf-wiggle{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(-1deg) translateY(-2px)}}
+.tf-header{animation:tf-drop .7s cubic-bezier(.34,1.3,.64,1) both}
+#start-screen .tf-card,#start-screen .tf-banner,#start-screen .tf-help{animation:tf-pop .6s cubic-bezier(.34,1.3,.64,1) both}
+#start-screen .tf-card--blocks{animation-delay:.15s}
+#start-screen .tf-card--numbers{animation-delay:.25s}
+#start-screen .tf-banner{animation-delay:.38s}
+#start-screen .tf-help{animation-delay:.5s}
+.tf-badge{animation:tf-wiggle 3.2s ease-in-out 1s infinite}
+.tf-card--numbers .tf-badge{animation-delay:1.6s}
+@media (prefers-reduced-motion:reduce){
+  .tf-header,#start-screen .tf-card,#start-screen .tf-banner,#start-screen .tf-help,.tf-badge{animation:none}
+  #start-screen .tf-card,#start-screen .tf-banner,#start-screen .tf-help,.tf-art img,.tf-camera,.tf-pill img,.tf-banner-go{transition:none}
+}
+
+/* 세로 화면(휴대전화·세로 태블릿) */
+@media (max-aspect-ratio:4/5){
+  #start-screen.tf-home{
+    --S:min(100vw,640px);
+    justify-content:safe center;
+    padding:calc(62px + env(safe-area-inset-top,0px)) 12px calc(var(--S)*.2);
   }
-  #start-screen .home-header{
-    min-height:clamp(68px,14vh,105px);
-    margin-bottom:clamp(25px,5vh,50px);
+  .tf-bg{
+    -webkit-mask-image:linear-gradient(180deg,#000 0,#000 calc(var(--S)*.9),transparent calc(var(--S)*1.1));
+            mask-image:linear-gradient(180deg,#000 0,#000 calc(var(--S)*.9),transparent calc(var(--S)*1.1));
+    background-position:center top;background-size:calc(var(--S)*1.35) auto;
   }
-  #start-screen .home-logo-image{
-    width:min(100%,525px);
-    max-height:clamp(60px,12vh,100px);
+  .tf-bg-beach{
+    display:block;
+    background:url("assets/home/background/coastal-city.png") center bottom/calc(var(--S)*1.35) auto no-repeat;
+    -webkit-mask-image:linear-gradient(0deg,#000 0,#000 calc(var(--S)*.2),transparent calc(var(--S)*.32));
+            mask-image:linear-gradient(0deg,#000 0,#000 calc(var(--S)*.2),transparent calc(var(--S)*.32));
   }
-  #start-screen .home-logo{font-size:clamp(28px,7vw,45px)}
-  #start-screen .home-content{width:100%;gap:17px}
-  #start-screen .home-play{
-    max-height:none;
-    aspect-ratio:.91/1;
-  }
-  #start-screen .home-play-art svg{max-height:100%}
-  #start-screen .home-camera{min-height:106px}
+  .tf-content{width:100%;max-width:640px;gap:calc(var(--S)*.075) calc(var(--S)*.035)}
+  .tf-header{margin-bottom:calc(var(--S)*.07)}
+  .tf-logo-img{width:96%}
+  .tf-logo-text{font-size:calc(var(--S)*.11)}
+  #start-screen .tf-card{aspect-ratio:1/1.05;padding:calc(var(--S)*.08) calc(var(--S)*.03) calc(var(--S)*.035);border-radius:calc(var(--S)*.07);border-width:calc(var(--S)*.01)}
+  .tf-badge{font-size:calc(var(--S)*.048);top:calc(var(--S)*-.055)}
+  .tf-pill{font-size:calc(var(--S)*.055);padding:calc(var(--S)*.02) calc(var(--S)*.02)}
+  #start-screen.home-english .tf-pill{font-size:calc(var(--S)*.038)}
+  .tf-pill img{width:calc(var(--S)*.06)}
+  #start-screen .tf-banner{grid-template-columns:auto minmax(0,1fr) auto;gap:calc(var(--S)*.035);padding:calc(var(--S)*.04) calc(var(--S)*.045);border-radius:calc(var(--S)*.07);border-width:calc(var(--S)*.01)}
+  .tf-divider,.tf-photo{display:none}
+  .tf-camera{width:calc(var(--S)*.17)}
+  .tf-banner-title{font-size:calc(var(--S)*.064)}
+  .tf-banner-desc{font-size:calc(var(--S)*.038)}
+  .tf-banner-go{width:calc(var(--S)*.085)}
+  #start-screen .tf-help{font-size:calc(var(--S)*.058);padding:calc(var(--S)*.025) calc(var(--S)*.08)}
+  .tf-help img{width:calc(var(--S)*.065)}
+}
+/* 낮고 넓은 화면(노트북·가로 태블릿): 카드 비율을 조금 납작하게 */
+@media (min-aspect-ratio:3/2){
+  #start-screen.tf-home{--S:min(100vh,62vw)}
+  @supports (height:100svh){#start-screen.tf-home{--S:min(100svh,62vw)}}
+  .tf-content{width:calc(var(--S)*1.05)}
+  #start-screen .tf-card{aspect-ratio:1/.75}
 }
 </style>
 </head>
 <body>
 
-<div id="start-screen">
- <div class="home-decor" aria-hidden="true">
-  <span class="home-cloud cloud-a"></span><span class="home-cloud cloud-b"></span><span class="home-cloud cloud-c"></span>
-  <svg class="home-airplane" viewBox="0 0 190 65"><path d="M0 60Q65 40 181 10" fill="none" stroke="white" stroke-width="3" opacity=".72"/><g transform="translate(85 0) rotate(-14 48 22)"><path d="M0 25L92 17Q102 17 100 22L5 32Z" fill="#FFFFFF"/><path d="M34 24 58 1 69 5 54 26Z" fill="#F9B7B5"/><path d="M20 30 46 55 58 52 38 26Z" fill="#FFFFFF"/></g></svg>
-  <svg class="home-tower" viewBox="0 0 90 270"><path d="M36 72H54V270H36Z" fill="#EE988C"/><path d="M12 78h66l-8 44H20Z" fill="#F36A78"/><path d="M20 85H70V105H20Z" fill="#FFD9B3"/><path d="M41 48H49V77H41Z" fill="#F8A18F"/><path d="M28 58h34v19H28Z" rx="4" fill="#FFE1C7"/></svg>
-  <svg class="home-skyline" viewBox="0 0 1254 300" preserveAspectRatio="xMidYMax slice" aria-hidden="true"><g opacity=".86"><rect x="-8" y="258" width="27" height="42" fill="#efa09b" rx="2"/><rect x="0" y="269" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="12" y="269" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="75" y="221" width="38" height="79" fill="#f8b2a6" rx="2"/><rect x="83" y="232" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="95" y="232" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="83" y="251" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="95" y="251" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="83" y="270" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="95" y="270" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="158" y="184" width="49" height="116" fill="#f8c5a7" rx="2"/><rect x="166" y="195" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="178" y="195" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="166" y="214" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="178" y="214" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="166" y="233" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="178" y="233" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="166" y="252" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="178" y="252" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="166" y="271" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="178" y="271" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="241" y="147" width="60" height="153" fill="#f7a9a1" rx="2"/><rect x="249" y="158" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="158" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="177" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="177" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="196" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="196" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="215" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="215" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="234" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="234" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="253" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="253" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="249" y="272" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="261" y="272" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="324" y="245" width="27" height="55" fill="#efa09b" rx="2"/><rect x="332" y="256" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="344" y="256" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="332" y="275" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="344" y="275" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="407" y="208" width="38" height="92" fill="#f8b2a6" rx="2"/><rect x="415" y="219" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="427" y="219" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="415" y="238" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="427" y="238" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="415" y="257" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="427" y="257" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="415" y="276" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="427" y="276" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="490" y="171" width="49" height="129" fill="#f8c5a7" rx="2"/><rect x="498" y="182" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="182" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="498" y="201" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="201" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="498" y="220" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="220" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="498" y="239" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="239" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="498" y="258" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="258" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="498" y="277" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="510" y="277" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="573" y="134" width="60" height="166" fill="#f7a9a1" rx="2"/><rect x="581" y="145" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="145" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="164" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="164" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="183" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="183" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="202" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="202" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="221" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="221" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="240" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="240" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="259" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="259" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="581" y="278" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="593" y="278" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="656" y="232" width="27" height="68" fill="#efa09b" rx="2"/><rect x="664" y="243" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="676" y="243" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="664" y="262" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="676" y="262" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="664" y="281" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="676" y="281" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="739" y="195" width="38" height="105" fill="#f8b2a6" rx="2"/><rect x="747" y="206" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="759" y="206" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="747" y="225" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="759" y="225" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="747" y="244" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="759" y="244" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="747" y="263" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="759" y="263" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="747" y="282" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="759" y="282" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="822" y="158" width="49" height="142" fill="#f8c5a7" rx="2"/><rect x="830" y="169" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="169" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="830" y="188" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="188" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="830" y="207" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="207" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="830" y="226" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="226" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="830" y="245" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="245" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="830" y="264" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="842" y="264" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="905" y="256" width="60" height="44" fill="#f7a9a1" rx="2"/><rect x="913" y="267" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="925" y="267" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="988" y="219" width="27" height="81" fill="#efa09b" rx="2"/><rect x="996" y="230" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1008" y="230" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="996" y="249" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1008" y="249" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="996" y="268" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1008" y="268" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1071" y="182" width="38" height="118" fill="#f8b2a6" rx="2"/><rect x="1079" y="193" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1091" y="193" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1079" y="212" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1091" y="212" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1079" y="231" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1091" y="231" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1079" y="250" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1091" y="250" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1079" y="269" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1091" y="269" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1154" y="145" width="49" height="155" fill="#f8c5a7" rx="2"/><rect x="1162" y="156" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="156" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="175" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="175" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="194" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="194" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="213" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="213" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="232" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="232" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="251" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="251" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1162" y="270" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1174" y="270" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1237" y="243" width="60" height="57" fill="#f7a9a1" rx="2"/><rect x="1245" y="254" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1257" y="254" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1245" y="273" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1257" y="273" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="20" y="206" width="27" height="94" fill="#efa09b" rx="2"/><rect x="28" y="217" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="40" y="217" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="28" y="236" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="40" y="236" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="28" y="255" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="40" y="255" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="28" y="274" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="40" y="274" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="103" y="169" width="38" height="131" fill="#f8b2a6" rx="2"/><rect x="111" y="180" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="180" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="111" y="199" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="199" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="111" y="218" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="218" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="111" y="237" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="237" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="111" y="256" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="256" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="111" y="275" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="123" y="275" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="186" y="132" width="49" height="168" fill="#f8c5a7" rx="2"/><rect x="194" y="143" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="143" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="162" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="162" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="181" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="181" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="200" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="200" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="219" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="219" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="238" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="238" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="257" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="257" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="194" y="276" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="206" y="276" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="269" y="230" width="60" height="70" fill="#f7a9a1" rx="2"/><rect x="277" y="241" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="289" y="241" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="277" y="260" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="289" y="260" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="277" y="279" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="289" y="279" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="352" y="193" width="27" height="107" fill="#efa09b" rx="2"/><rect x="360" y="204" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="372" y="204" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="360" y="223" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="372" y="223" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="360" y="242" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="372" y="242" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="360" y="261" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="372" y="261" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="360" y="280" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="372" y="280" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="435" y="156" width="38" height="144" fill="#f8b2a6" rx="2"/><rect x="443" y="167" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="167" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="186" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="186" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="205" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="205" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="224" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="224" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="243" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="243" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="262" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="262" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="443" y="281" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="455" y="281" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="518" y="254" width="49" height="46" fill="#f8c5a7" rx="2"/><rect x="526" y="265" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="538" y="265" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="601" y="217" width="60" height="83" fill="#f7a9a1" rx="2"/><rect x="609" y="228" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="621" y="228" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="609" y="247" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="621" y="247" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="609" y="266" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="621" y="266" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="684" y="180" width="27" height="120" fill="#efa09b" rx="2"/><rect x="692" y="191" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="704" y="191" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="692" y="210" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="704" y="210" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="692" y="229" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="704" y="229" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="692" y="248" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="704" y="248" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="692" y="267" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="704" y="267" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="767" y="143" width="38" height="157" fill="#f8b2a6" rx="2"/><rect x="775" y="154" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="154" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="173" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="173" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="192" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="192" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="211" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="211" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="230" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="230" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="249" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="249" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="775" y="268" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="787" y="268" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="850" y="241" width="49" height="59" fill="#f8c5a7" rx="2"/><rect x="858" y="252" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="870" y="252" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="858" y="271" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="870" y="271" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="933" y="204" width="60" height="96" fill="#f7a9a1" rx="2"/><rect x="941" y="215" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="953" y="215" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="941" y="234" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="953" y="234" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="941" y="253" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="953" y="253" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="941" y="272" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="953" y="272" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1016" y="167" width="27" height="133" fill="#efa09b" rx="2"/><rect x="1024" y="178" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="178" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1024" y="197" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="197" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1024" y="216" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="216" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1024" y="235" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="235" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1024" y="254" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="254" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1024" y="273" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1036" y="273" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1099" y="130" width="38" height="170" fill="#f8b2a6" rx="2"/><rect x="1107" y="141" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="141" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="160" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="160" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="179" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="179" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="198" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="198" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="217" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="217" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="236" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="236" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="255" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="255" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1107" y="274" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1119" y="274" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1182" y="228" width="49" height="72" fill="#f8c5a7" rx="2"/><rect x="1190" y="239" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1202" y="239" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1190" y="258" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1202" y="258" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1190" y="277" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1202" y="277" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1265" y="191" width="60" height="109" fill="#f7a9a1" rx="2"/><rect x="1273" y="202" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1285" y="202" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1273" y="221" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1285" y="221" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1273" y="240" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1285" y="240" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1273" y="259" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1285" y="259" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1273" y="278" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="1285" y="278" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="48" y="154" width="27" height="146" fill="#efa09b" rx="2"/><rect x="56" y="165" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="165" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="184" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="184" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="203" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="203" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="222" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="222" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="241" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="241" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="260" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="260" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="56" y="279" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="68" y="279" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="131" y="252" width="38" height="48" fill="#f8b2a6" rx="2"/><rect x="139" y="263" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="151" y="263" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="139" y="282" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="151" y="282" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="214" y="215" width="49" height="85" fill="#f8c5a7" rx="2"/><rect x="222" y="226" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="234" y="226" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="222" y="245" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="234" y="245" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="222" y="264" width="5" height="8" fill="#ffe0c9" opacity=".62"/><rect x="234" y="264" width="5" height="8" fill="#ffe0c9" opacity=".62"/></g></svg>
-  <svg class="home-beach-left" viewBox="0 0 225 135"><path d="m40 38 40 96m70 -106 34 105" stroke="#153E77" stroke-width="5"/><path d="M4 59Q43 -10 91 40l22 27Q86 57 69 79Q42 56 22 72Q12 62 4 59Z" fill="#F15C77"/><path d="M45 24Q45 53 42 67Q29 55 22 72Q22 45 45 24Z" fill="#FFFFFF"/><path d="M45 24Q71 25 69 79Q55 61 42 67Z" fill="#FFFFFF"/><path d="M120 47Q158 -10 201 42l18 26Q191 59 175 82Q150 59 134 72Q125 54 120 47Z" fill="#F15C77"/><path d="M156 30Q157 55 153 65Q143 57 134 72Q137 44 156 30Z" fill="#FFFFFF"/><path d="M156 30Q185 33 175 82Q162 67 153 65Z" fill="#FFFFFF"/><path d="m37 118 9 -7 7 8 14 -1 -7 9 5 9 -15 -2 -10 9 -3 -12 -15 -3 14 -5Z" fill="#EB8294"/></svg>
-  <svg class="home-beach-right" viewBox="0 0 230 145"><rect x="35" y="62" width="70" height="81" fill="#F9A6A0"/><rect x="56" y="44" width="42" height="98" fill="#FFC6A7"/><path d="M128 68L180 21l49 47Z" fill="#F26975"/><rect x="141" y="68" width="77" height="72" fill="#FFD2A0"/><rect x="132" y="70" width="95" height="12" fill="#D74F69"/><rect x="45" y="80" width="8" height="11" fill="#FFEEE2"/><rect x="62" y="83" width="8" height="11" fill="#FFEEE2"/><rect x="79" y="86" width="8" height="11" fill="#FFEEE2"/></svg>
-  <div class="home-wave"></div>
-</div>
+<div id="start-screen" class="tf-home">
+ <div class="tf-bg" aria-hidden="true"></div>
+ <div class="tf-bg-beach" aria-hidden="true"></div>
  <button id="lang-btn" onclick="toggleLanguage()">English</button>
  <div class="teacher-mark">© 주디쌤</div>
- <div class="home-content">
-  <header class="home-header">
-   <img class="home-logo-image" src="assets/home-title.png" alt="들쑥날쑥 빌딩숲" decoding="async">
-   <h1 class="home-logo" id="t-main-title">들쑥날쑥 빌딩숲</h1>
-   <span class="home-hidden" id="t-subtitle">Skyscrapers</span>
+ <div class="tf-content">
+  <header class="tf-header">
+   <img class="tf-logo-img" src="assets/home/title/towerforest.png" width="850" height="150" alt="들쑥날쑥 빌딩숲" decoding="async">
+   <h1 class="tf-logo-text" id="t-main-title">들쑥날쑥 빌딩숲</h1>
+   <span class="tf-sr" id="t-subtitle">Skyscrapers</span>
   </header>
-  <div class="home-cards" role="group" aria-label="빌딩숲 놀이 선택">
-   <button class="home-play home-block" type="button" onclick="startMode('3d')">
-    <span class="home-bubble" id="t-bubble-1">놀이 1</span>
-    <span class="home-play-art"><svg viewBox="0 0 440 290" role="img" aria-label="빨강 1층, 노랑 2층, 초록 3층, 파랑 4층 건물"><path d="M28 254L90 164L358 164L415 254Z" fill="#F6FBFF" stroke="#6EC7F6" stroke-width="5" stroke-linejoin="round"/><path d="M78 196H380M52 227H399M165 164L120 254M228 164L217 254M296 164L328 254" stroke="#DCE8EF" stroke-width="3"/><g stroke-linejoin="round"><path d="M139 196l20 -16v43l-20 16Z" fill="#C93337" stroke="#C93337" stroke-width="2"/><rect x="92" y="196" width="47" height="43" rx="2" fill="#F04943" stroke="#C93337" stroke-width="2"/><path d="M92 196l20 -16h47l-20 16Z" fill="#FF8E81" stroke="#C93337" stroke-width="2"/></g><g stroke-linejoin="round"><path d="M216 153l20 -16v86l-20 16Z" fill="#DF9A07" stroke="#DF9A07" stroke-width="2"/><rect x="169" y="153" width="47" height="86" rx="2" fill="#FFC525" stroke="#DF9A07" stroke-width="2"/><path d="M169 153l20 -16h47l-20 16Z" fill="#FFE26A" stroke="#DF9A07" stroke-width="2"/><path d="M169 196h47l20 -16" fill="none" stroke="#DF9A07" stroke-width="3" opacity=".68"/></g><g stroke-linejoin="round"><path d="M293 110l20 -16v129l-20 16Z" fill="#219B34" stroke="#219B34" stroke-width="2"/><rect x="246" y="110" width="47" height="129" rx="2" fill="#41CC43" stroke="#219B34" stroke-width="2"/><path d="M246 110l20 -16h47l-20 16Z" fill="#8BF578" stroke="#219B34" stroke-width="2"/><path d="M246 153h47l20 -16" fill="none" stroke="#219B34" stroke-width="3" opacity=".68"/><path d="M246 196h47l20 -16" fill="none" stroke="#219B34" stroke-width="3" opacity=".68"/></g><g stroke-linejoin="round"><path d="M370 67l20 -16v172l-20 16Z" fill="#126ABC" stroke="#126ABC" stroke-width="2"/><rect x="323" y="67" width="47" height="172" rx="2" fill="#268DE6" stroke="#126ABC" stroke-width="2"/><path d="M323 67l20 -16h47l-20 16Z" fill="#71C9FA" stroke="#126ABC" stroke-width="2"/><path d="M323 110h47l20 -16" fill="none" stroke="#126ABC" stroke-width="3" opacity=".68"/><path d="M323 153h47l20 -16" fill="none" stroke="#126ABC" stroke-width="3" opacity=".68"/><path d="M323 196h47l20 -16" fill="none" stroke="#126ABC" stroke-width="3" opacity=".68"/></g></svg></span>
-    <span class="home-play-label"><span id="t-mode-3d-title">블록으로 짓기</span><span class="home-go" aria-hidden="true">›</span></span>
-    <span id="t-mode-3d-desc" class="home-hidden">블록을 쌓아 빌딩숲 문제를 해결해요</span>
-   </button>
-   <button class="home-play home-number" type="button" onclick="startMode('2d')">
-    <span class="home-bubble" id="t-bubble-2">놀이 2</span>
-    <span class="home-play-art"><svg viewBox="0 0 330 330" role="img" aria-label="숫자 1부터 4가 들어간 4 곱하기 4 빌딩숲 수 퍼즐"><rect x="19" y="19" width="292" height="292" rx="20" fill="white" stroke="#172f57" stroke-width="6"/><path d="M92 20V311M20 92H311" stroke="#d4d8df" stroke-width="3"/><path d="M165 20V311M20 165H311" stroke="#d4d8df" stroke-width="3"/><path d="M238 20V311M20 238H311" stroke="#d4d8df" stroke-width="3"/><rect x="240" y="21" width="69" height="69" rx="4" fill="#c8e9fb"/><text x="274" y="76" text-anchor="middle" font-size="54" font-family="Jua, sans-serif" fill="#153053">4</text><rect x="94" y="94" width="69" height="69" rx="4" fill="#ffe18b"/><text x="128" y="149" text-anchor="middle" font-size="54" font-family="Jua, sans-serif" fill="#153053">2</text><rect x="21" y="167" width="69" height="69" rx="4" fill="#f9bbcf"/><text x="55" y="222" text-anchor="middle" font-size="54" font-family="Jua, sans-serif" fill="#153053">1</text><rect x="240" y="240" width="69" height="69" rx="4" fill="#c8e9fb"/><text x="274" y="295" text-anchor="middle" font-size="54" font-family="Jua, sans-serif" fill="#153053">4</text><rect x="240" y="94" width="69" height="69" rx="4" fill="#c0efb0"/><text x="274" y="149" text-anchor="middle" font-size="54" font-family="Jua, sans-serif" fill="#153053">3</text></svg></span>
-    <span class="home-play-label"><span id="t-mode-2d-title">수로 해결하기</span><span class="home-go" aria-hidden="true">›</span></span>
-    <span id="t-mode-2d-desc" class="home-hidden">수를 사용해 빌딩숲 문제를 해결해요</span>
-   </button>
-  </div>
-  <a class="home-camera" href="camera.html" aria-label="실물 보드게임으로 만든 빌딩숲 정답 확인하기">
-   <span class="home-camera-art"><svg viewBox="0 0 340 160" role="img" aria-label="카메라로 빌딩숲 보드를 촬영하고 정답 확인"><g transform="translate(7 28)"><rect x="5" y="22" width="116" height="95" rx="18" fill="#44b4ed" stroke="#1553a4" stroke-width="6"/><rect x="25" y="10" width="47" height="23" rx="7" fill="#99dfff" stroke="#1553a4" stroke-width="5"/><circle cx="62" cy="71" r="36" fill="#FFFFFF"/><circle cx="62" cy="71" r="23" fill="#154d9c"/><circle cx="53" cy="61" r="8" fill="#9ad7fa"/></g><g transform="translate(132 8) rotate(7 100 74)"><rect width="170" height="138" rx="13" fill="#FFFFFF" stroke="#bbc5d1" stroke-width="6"/><rect x="11" y="12" width="148" height="113" rx="6" fill="#E4F5FE"/><rect x="19" y="98" width="28" height="27" fill="#EF4D4A"/><rect x="51" y="76" width="28" height="49" fill="#FFC72B"/><rect x="83" y="54" width="28" height="71" fill="#42C65D"/><rect x="115" y="22" width="28" height="103" fill="#2989DF"/></g><circle cx="284" cy="125" r="32" fill="#2BCC59" stroke="white" stroke-width="6"/><path d="m268 124 11 11 22 -25" fill="none" stroke="white" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/></svg></span>
-   <span class="home-camera-content"><span class="home-camera-title" id="t-mode-cam-title">내 빌딩숲 확인하기</span><span class="home-camera-desc" id="t-mode-cam-desc">실제 보드게임으로 만든 빌딩숲을<br>잘 만들었는지 확인해요</span></span>
-   <span class="home-camera-go" aria-hidden="true">›</span>
+  <button class="tf-card tf-card--blocks" type="button" onclick="startMode('3d')">
+   <span class="tf-badge" id="t-bubble-1">놀이 1</span>
+   <span class="tf-art"><img src="assets/home/icons/block-towers-noplate.png" width="337" height="226" alt="빨강 1층, 노랑 2층, 초록 3층, 파랑 4층 블록 건물"></span>
+   <span class="tf-pill"><span id="t-mode-3d-title">블록으로 짓기</span><img src="assets/home/icons/arrow-blue.png" width="54" height="54" alt=""></span>
+   <span id="t-mode-3d-desc" class="tf-sr">블록을 쌓아 빌딩숲 문제를 해결해요</span>
+  </button>
+  <button class="tf-card tf-card--numbers" type="button" onclick="startMode('2d')">
+   <span class="tf-badge" id="t-bubble-2">놀이 2</span>
+   <span class="tf-art"><svg class="tf-grid" viewBox="0 0 300 300" role="img" aria-label="숫자 1부터 4가 들어간 4 곱하기 4 빌딩숲 수 퍼즐">
+    <rect x="6" y="6" width="288" height="288" rx="26" fill="#fff"/>
+    <g fill="#c2e5fb"><rect x="153" y="13" width="64" height="64" rx="8"/><rect x="223" y="223" width="64" height="64" rx="8"/></g>
+    <rect x="83" y="83" width="64" height="64" rx="8" fill="#ffc928"/>
+    <rect x="223" y="83" width="64" height="64" rx="8" fill="#93dd6e"/>
+    <rect x="13" y="153" width="64" height="64" rx="8" fill="#f9bccd"/>
+    <path d="M80 10V290M150 10V290M220 10V290M10 80H290M10 150H290M10 220H290" stroke="#d3d7dd" stroke-width="4"/>
+    <rect x="6" y="6" width="288" height="288" rx="26" fill="none" stroke="#17223b" stroke-width="10"/>
+    <g font-family="Jua, sans-serif" font-size="46" fill="#14274a" stroke="#14274a" stroke-width="1.5" text-anchor="middle">
+     <text x="185" y="61">4</text><text x="115" y="131">2</text><text x="255" y="131">3</text><text x="45" y="201">1</text><text x="255" y="271">4</text>
+    </g>
+   </svg></span>
+   <span class="tf-pill"><span id="t-mode-2d-title">수로 해결하기</span><img src="assets/home/icons/arrow-blue.png" width="54" height="54" alt=""></span>
+   <span id="t-mode-2d-desc" class="tf-sr">수를 사용해 빌딩숲 문제를 해결해요</span>
+  </button>
+  <a class="tf-banner" href="camera.html">
+   <span class="tf-banner-art" aria-hidden="true">
+    <img class="tf-camera" src="assets/home/icons/camera.png" width="147" height="124" alt="">
+    <span class="tf-photo"><img src="assets/home/icons/block-towers.png" width="394" height="242" alt=""><img class="tf-check" src="assets/home/icons/check.png" width="73" height="73" alt=""></span>
+   </span>
+   <span class="tf-divider" aria-hidden="true"></span>
+   <span class="tf-banner-copy"><span class="tf-banner-title" id="t-mode-cam-title">내 빌딩숲 확인하기</span><span class="tf-banner-desc" id="t-mode-cam-desc">실제 보드게임으로 만든 빌딩숲을<br>잘 만들었는지 확인해요</span></span>
+   <img class="tf-banner-go" src="assets/home/icons/arrow-coral.png" width="71" height="72" alt="">
   </a>
-  <button id="help-btn" class="home-help" type="button"><span class="home-help-icon" aria-hidden="true">?</span><span id="t-help-label">놀이 방법</span></button>
+  <button id="help-btn" class="tf-help" type="button"><img src="assets/home/icons/help.png" width="61" height="59" alt=""><span id="t-help-label">놀이 방법</span></button>
  </div>
 </div>
 
@@ -591,7 +601,7 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   <div id="message"></div>
   <div id="game-2d-container"></div>
   <div class="controls-area">
-    <button class="btn-home" onclick="goHome()" id="t-btn-home">🏠 처음으로</button>
+    <button class="btn-home" onclick="goHome()"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5.5h4V20"/></svg><span id="t-btn-home">처음으로</span></button>
     <button class="btn-prev" onclick="changeLevel(-1)" id="t-btn-prev">⬅️ 이전</button>
     <button class="btn-check" onclick="checkAnswer()" id="t-btn-check">✅ 정답확인</button>
     <button class="btn-reset" onclick="resetGame()" id="t-btn-reset">🔄 다시하기</button>
@@ -674,7 +684,7 @@ const translations = {
     rule2Title: "2. 건물 세우기", rule2Desc: "가로줄과 세로줄에 층별 건물을 모두 한 개씩 세워주세요.<br>한 줄에 같은 높이의 건물이 두 개 있으면 안 돼요!",
     rule3Title: "3. 보이는 건물 수", rule3Desc: "화살표의 숫자는 그곳에 서서 줄을 바라봤을 때 눈에 보이는 건물의 개수예요.",
     rule4Title: "4. 상상해보세요!", rule4Desc: "앞에 높은 건물이 있으면, 뒤에 있는 낮은 건물은 가려져서 보이지 않아요.",
-    btnHome: "🏠 처음으로", btnPrev: "⬅️ 이전", btnCheck: "✅ 정답확인", btnReset: "🔄 다시하기", btnNext: "다음 ➡️",
+    btnHome: "처음으로", btnPrev: "⬅️ 이전", btnCheck: "✅ 정답확인", btnReset: "🔄 다시하기", btnNext: "다음 ➡️",
     invHeader: "무엇을 세울까요?", floor1: "1층 건물", floor2: "2층 건물", floor3: "3층 건물", floor4: "4층 건물",
     remaining: "남은 개수:", levelTitle: "문제",
     msgIncomplete: "🚧 공사가 덜 끝났어요!", msgDuplicate: "❌ 같은 줄에 높이가 같은 건물이 있어요!",
@@ -689,7 +699,7 @@ const translations = {
     rule2Title: "2. Building Rules", rule2Desc: "Place one building of each height in every row and column.<br>No two buildings of the same height in a line!",
     rule3Title: "3. Visibility Rules", rule3Desc: "The number on the arrow shows how many buildings you can see from that spot looking down the line.",
     rule4Title: "4. Imagine!", rule4Desc: "If there is a tall building in front, lower buildings behind it are hidden and cannot be seen.",
-    btnHome: "🏠 Home", btnPrev: "⬅️ Prev", btnCheck: "✅ Check", btnReset: "🔄 Reset", btnNext: "Next ➡️",
+    btnHome: "Home", btnPrev: "⬅️ Prev", btnCheck: "✅ Check", btnReset: "🔄 Reset", btnNext: "Next ➡️",
     invHeader: "Select Building", floor1: "1-Story", floor2: "2-Story", floor3: "3-Story", floor4: "4-Story",
     remaining: "Left:", levelTitle: "Puzzle",
     msgIncomplete: "🚧 Construction not finished!", msgDuplicate: "❌ Duplicate heights in a line!",
@@ -834,7 +844,21 @@ function render2D() {
   puzzle.clues.bottom.forEach(c => addClue2D(board, c, 'bottom', badgeSize, badgeFont, arrowSize, applyHintStyle));
   addCell2D(board, '', applyHintStyle);
   container.appendChild(board);
+  fit2D();
 }
+/* 게임판을 남은 공간 가운데에 맞춰 키우기 */
+function fit2D() {
+  const container = document.getElementById('game-2d-container');
+  const board = container.querySelector('.game-board-2d');
+  if (!board || container.style.display === 'none') return;
+  board.style.transform = 'none';
+  const availW = container.clientWidth - 32, availH = container.clientHeight - 56;
+  const bw = board.offsetWidth, bh = board.offsetHeight + 8; // 아래 그림자 포함
+  if (!bw || !bh || availW <= 0 || availH <= 0) return;
+  const s = Math.max(0.5, Math.min(availW / bw, availH / bh, 2.2));
+  board.style.transform = `scale(${s.toFixed(3)})`;
+}
+window.addEventListener('resize', fit2D);
 function addCell2D(parent, text, styleFunc) { const d = document.createElement('div'); d.innerText = text; if (styleFunc) styleFunc(d); parent.appendChild(d); }
 function addClue2D(parent, val, dir, bSize, bFont, aSize, styleFunc) {
   const wrapper = document.createElement('div');
