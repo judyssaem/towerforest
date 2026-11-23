@@ -520,6 +520,14 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   .tf-content{width:calc(var(--S)*1.05)}
   #start-screen .tf-card{aspect-ratio:1/.75}
 }
+/* 넓은 화면: 양옆까지 이어지는 배경(3000×1254, 장식은 카드 바깥으로 옮김) */
+@media (min-aspect-ratio:8/5){
+  .tf-bg{
+    background-image:url("assets/home/background/coastal-city-wide.jpg");
+    -webkit-mask-image:linear-gradient(90deg,transparent calc(50% - 119.6vh),#000 calc(50% - 110vh),#000 calc(50% + 110vh),transparent calc(50% + 119.6vh));
+            mask-image:linear-gradient(90deg,transparent calc(50% - 119.6vh),#000 calc(50% - 110vh),#000 calc(50% + 110vh),transparent calc(50% + 119.6vh));
+  }
+}
 </style>
 </head>
 <body>
