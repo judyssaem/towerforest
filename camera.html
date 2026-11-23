@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>카메라 세계 | 들쑥날쑥 빌딩 숲</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page-bg: #fdfbf7; --ink: #4a4a4a; --main: #5c6bc0;
+  --f1: #e84b3c; --f2: #f39a1e; --f3: #2fbf62; --f4: #2f74dc;
+  --pink: #f8d4d6; --pink-ink: #d9485f; --sky: #dcebf8; --sky-ink: #2f8fd6;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background-color: var(--page-bg);
+  background-image: radial-gradient(#e0e0e0 1px, transparent 1px);
+  background-size: 20px 20px;
+  color: var(--ink);
+  user-select: none; -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+button { font-family: inherit; cursor: pointer; }
+.screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+.screen.on { display: flex; }
+
+/* ---------- 상단 ---------- */
+.top { width: 100%; max-width: 720px; display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.top h1 { flex: 1; margin: 0; text-align: center; color: var(--main); font-size: clamp(1.2rem, 5.5vw, 1.7rem); white-space: nowrap;
+  text-shadow: 2px 2px 0 #c5cae9; }
+.round-btn { background: #fff; border: 3px solid var(--main); color: var(--main); border-radius: 40px;
+  padding: 6px 14px; font-size: 1.05rem; white-space: nowrap; }
+
+/* ---------- 문제 고르기 ---------- */
+#pick { overflow-y: auto; }
+.pick-guide { font-size: 1.25rem; margin: 4px 0 14px; text-align: center; }
+.set-title { width: 100%; max-width: 560px; font-size: 1.15rem; margin: 6px 0 8px; }
+.set-title span { padding: 3px 12px; border-radius: 20px; color: #fff; }
+.grid-btns { width: 100%; max-width: 560px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
+.num-btn { aspect-ratio: 1; border-radius: 18px; border: none; font-size: 1.9rem; background: #fff;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.08); position: relative; overflow: hidden; }
+.num-btn::before { content: ""; position: absolute; left: 0; top: 0; width: 38%; height: 38%;
+  background: linear-gradient(135deg, #ececec 50%, transparent 50%); }
+.num-btn.s3 { color: var(--pink-ink); border: 3px solid var(--pink); }
+.num-btn.s4 { color: var(--sky-ink); border: 3px solid var(--sky); }
+.num-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,0.08); }
+
+/* ---------- 카메라 ---------- */
+#cam { background: #111; padding: 0; }
+#video, #still { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+#still { display: none; }
+#overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cam-top { position: absolute; left: 0; right: 0; top: 0; padding: calc(12px + env(safe-area-inset-top, 0px)) 14px 10px;
+  display: flex; align-items: center; gap: 10px; background: linear-gradient(rgba(0,0,0,.55), transparent); }
+.cam-top .badge { background: #fff; color: var(--main); border-radius: 30px; padding: 6px 16px; font-size: 1.25rem; }
+.cam-tip { flex: 1; color: #fff; font-size: 1.1rem; text-align: center; text-shadow: 0 1px 3px #000; word-break: keep-all; }
+.cam-bottom { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 20px calc(22px + env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; justify-content: space-between; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
+.side-btn { min-width: 92px; background: rgba(255,255,255,.92); border: none; border-radius: 30px; padding: 10px 14px; font-size: 1rem; color: #333; }
+#shutter { width: 84px; height: 84px; border-radius: 50%; border: 6px solid #fff; background: var(--main);
+  box-shadow: 0 0 0 4px rgba(92,107,192,.5); }
+#shutter:active { transform: scale(.94); }
+#cam-error { display: none; position: absolute; left: 20px; right: 20px; top: 40%; background: #fff; border-radius: 20px;
+  padding: 18px; text-align: center; font-size: 1.1rem; line-height: 1.5; }
+
+/* ---------- 결과 ---------- */
+#result { justify-content: flex-start; overflow-y: auto; }
+.verdict { margin: 6px 0 12px; padding: 14px 26px; border-radius: 30px; font-size: 2rem; text-align: center; background: #fff;
+  border: 4px solid; word-break: keep-all; }
+.verdict.ok { color: #1b8a45; border-color: var(--f3); }
+.verdict.no { color: #d9485f; border-color: #f5a3ad; }
+.verdict.retake { color: #8a6200; border-color: #f7c42f; font-size: 1.5rem; }
+.verdict-sub { font-size: 1.15rem; margin: -4px 0 12px; text-align: center; word-break: keep-all; }
+#result-canvas { width: min(92vw, 52vh, 520px); height: auto; border-radius: 16px; background: #fff; box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+.mini-board { display: grid; gap: 4px; margin: 12px 0 4px; }
+.mini-board div { width: 34px; height: 34px; border-radius: 8px; color: #fff; font-size: 1.2rem;
+  display: flex; align-items: center; justify-content: center; }
+.mini-cap { font-size: .95rem; color: #777; margin-bottom: 12px; }
+.res-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.big-btn { border: none; border-radius: 30px; padding: 12px 22px; font-size: 1.2rem; color: #fff; background: var(--main);
+  box-shadow: 0 5px 0 #3f4a8c; }
+.big-btn.alt { background: #fff; color: var(--main); border: 3px solid var(--main); box-shadow: none; }
+.big-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #3f4a8c; }
+#busy { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); color: #fff; font-size: 1.5rem;
+  align-items: center; justify-content: center; z-index: 50; }
+</style>
+</head>
+<body>
+
+<!-- 1. 문제 고르기 -->
+<section id="pick" class="screen on">
+  <div class="top">
+    <button class="round-btn" onclick="location.href='index.html'">🏠 처음으로</button>
+    <h1>📷 카메라 세계</h1>
+    <span style="width:40px"></span>
+  </div>
+  <p class="pick-guide">활동 카드의 문제 번호를 눌러요</p>
+  <div class="set-title"><span style="background:var(--pink-ink)">3×3 판</span></div>
+  <div class="grid-btns" id="btns3"></div>
+  <div class="set-title"><span style="background:var(--sky-ink)">4×4 판</span></div>
+  <div class="grid-btns" id="btns4"></div>
+</section>
+
+<!-- 2. 카메라 -->
+<section id="cam" class="screen">
+  <video id="video" playsinline muted autoplay></video>
+  <canvas id="overlay"></canvas>
+  <div class="cam-top">
+    <span class="badge" id="cam-badge">문제 1</span>
+    <span class="cam-tip">카드를 네모 안에 맞추고<br>위에서 똑바로 찍어요</span>
+  </div>
+  <div id="cam-error"></div>
+  <div class="cam-bottom">
+    <button class="side-btn" onclick="backToPick()">⬅️ 번호</button>
+    <button id="shutter" aria-label="찍기" onclick="takePhoto()"></button>
+    <button class="side-btn" onclick="document.getElementById('file').click()">🖼️ 사진</button>
+  </div>
+  <input type="file" id="file" accept="image/*" style="display:none" onchange="fromFile(this)">
+</section>
+
+<!-- 3. 결과 -->
+<section id="result" class="screen">
+  <div class="top">
+    <button class="round-btn" onclick="backToPick()">⬅️ 번호</button>
+    <h1 id="res-title">문제 1</h1>
+    <span style="width:80px"></span>
+  </div>
+  <div class="verdict" id="verdict"></div>
+  <div class="verdict-sub" id="verdict-sub"></div>
+  <canvas id="result-canvas"></canvas>
+  <div class="mini-board" id="mini"></div>
+  <div class="mini-cap" id="mini-cap">카메라가 본 빌딩 숲</div>
+  <div class="res-btns">
+    <button class="big-btn" onclick="openCamera()">📷 다시 찍기</button>
+    <button class="big-btn alt" onclick="backToPick()">🔢 다른 문제</button>
+  </div>
+</section>
+
+<div id="busy">🔍 빌딩을 살펴보는 중…</div>
+
+<!-- ======================= 인식·판정 (화면과 무관한 순수 함수) ======================= -->
+<script id="core">
+/* 활동 카드 1~25번 단서 (0 = 화살표 없음). top/bottom: 왼쪽 세로줄부터, left/right: 위쪽 가로줄부터 */
+const CARDS = {
+  1:  { size: 3, top: [0,0,0], bottom: [0,0,1], left: [1,0,3], right: [0,0,0] },
+  2:  { size: 3, top: [0,0,0], bottom: [0,1,0], left: [3,0,0], right: [0,0,0] },
+  3:  { size: 3, top: [1,0,0], bottom: [0,0,0], left: [0,0,2], right: [0,1,0] },
+  4:  { size: 3, top: [0,0,0], bottom: [2,0,3], left: [3,0,0], right: [0,0,0] },
+  5:  { size: 3, top: [0,2,0], bottom: [0,0,0], left: [0,2,0], right: [0,0,3] },
+  6:  { size: 3, top: [3,2,0], bottom: [0,0,0], left: [0,2,0], right: [0,0,0] },
+  7:  { size: 3, top: [0,0,0], bottom: [2,0,0], left: [0,3,0], right: [2,0,0] },
+  8:  { size: 3, top: [0,2,0], bottom: [0,0,0], left: [0,2,0], right: [3,0,0] },
+  9:  { size: 3, top: [0,0,2], bottom: [2,0,0], left: [2,0,0], right: [0,0,0] },
+  10: { size: 3, top: [2,0,0], bottom: [0,0,2], left: [0,0,0], right: [2,0,0] },
+  11: { size: 4, top: [0,0,0,1], bottom: [1,0,3,0], left: [4,0,0,0], right: [0,0,0,0] },
+  12: { size: 4, top: [0,0,1,4], bottom: [0,0,0,0], left: [0,0,1,4], right: [0,0,0,0] },
+  13: { size: 4, top: [1,0,0,2], bottom: [0,1,0,0], left: [0,0,4,0], right: [0,0,0,0] },
+  14: { size: 4, top: [4,0,1,0], bottom: [0,0,0,0], left: [0,0,0,0], right: [0,1,0,4] },
+  15: { size: 4, top: [0,0,4,3], bottom: [0,0,0,0], left: [1,0,0,0], right: [0,0,1,0] },
+  16: { size: 4, top: [0,3,0,2], bottom: [0,0,0,0], left: [0,0,0,0], right: [0,0,3,4] },
+  17: { size: 4, top: [4,2,0,0], bottom: [0,0,2,0], left: [0,0,0,0], right: [0,0,0,2] },
+  18: { size: 4, top: [0,0,0,3], bottom: [0,0,3,0], left: [0,0,0,0], right: [0,2,4,0] },
+  19: { size: 4, top: [4,2,0,0], bottom: [0,0,0,0], left: [0,0,0,0], right: [0,2,3,0] },
+  20: { size: 4, top: [0,0,0,0], bottom: [0,3,0,0], left: [0,4,0,0], right: [3,0,0,2] },
+  21: { size: 4, top: [3,0,0,2], bottom: [0,0,0,0], left: [0,0,4,0], right: [0,0,0,3] },
+  22: { size: 4, top: [4,3,1,0], bottom: [0,0,0,0], left: [0,0,0,0], right: [0,0,3,3] },
+  23: { size: 4, top: [2,0,0,3], bottom: [0,0,2,0], left: [0,0,0,2], right: [0,0,3,0] },
+  24: { size: 4, top: [0,3,1,2], bottom: [0,0,0,0], left: [0,2,0,2], right: [0,0,0,0] },
+  25: { size: 4, top: [0,3,0,0], bottom: [0,0,2,0], left: [0,0,0,0], right: [2,2,3,0] },
+};
+
+/* ---------- 정답 판정: 정답표가 아니라 규칙으로 검사 (답이 여러 개인 문제도 맞게 판정) ---------- */
+function visibleCount(line) { let max = 0, c = 0; for (const v of line) if (v > max) { max = v; c++; } return c; }
+function checkBoard(board, card) {
+  const n = card.size;
+  const cols = [...Array(n)].map((_, c) => board.map(r => r[c]));
+  const full = v => new Set(v).size === n && v.every(x => x >= 1 && x <= n);
+  if (!board.every(full) || !cols.every(full)) return false;
+  for (let i = 0; i < n; i++) {
+    const checks = [[card.top[i], cols[i]], [card.bottom[i], [...cols[i]].reverse()],
+                    [card.left[i], board[i]], [card.right[i], [...board[i]].reverse()]];
+    for (const [clue, line] of checks) if (clue && visibleCount(line) !== clue) return false;
+  }
+  return true;
+}
+
+/* ---------- 색 → 층 (1 빨강, 2 주황, 3 초록, 4 파랑) ---------- */
+function floorOf(r, g, b) {
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  const v = max / 255, s = max ? d / max : 0;
+  if (d === 0) return 0;
+  let h;
+  if (max === r) h = 60 * (((g - b) / d) % 6); else if (max === g) h = 60 * ((b - r) / d + 2); else h = 60 * ((r - g) / d + 4);
+  if (h < 0) h += 360;
+  if ((h < 12 || h > 300) && s > 0.35 && v > 0.35) return 1;
+  if (h >= 12 && h < 42 && s > 0.45 && v > 0.55) return 2;
+  if (h > 105 && h < 175 && s > 0.35 && v > 0.3) return 3;
+  if (h > 200 && h < 260 && s > 0.4 && v > 0.3) return 4;
+  return 0;
+}
+
+/* ---------- 사진(정사각형으로 잘라 줄인 것)에서 빌딩 윗면 찾기 ----------
+   img: {data, width, height} RGBA,  n: 3 또는 4
+   반환: { ok, board, blobs, found } */
+function analyzeBoard(img, n) {
+  const W = img.width, H = img.height, N = W * H, px = new Uint8ClampedArray(img.data);
+  // 밝기·색 보정: 카드의 흰 바탕(밝은 쪽 상위 3%)이 흰색이 되도록 채널별로 늘림
+  for (let ch = 0; ch < 3; ch++) {
+    const hist = new Uint32Array(256); for (let i = 0; i < N; i++) hist[px[i * 4 + ch]]++;
+    let acc = 0, ref = 255; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc >= N * 0.03) { ref = v; break; } }
+    const gain = Math.min(2.5, 245 / Math.max(ref, 1));
+    if (gain > 1.02) for (let i = 0; i < N; i++) px[i * 4 + ch] = px[i * 4 + ch] * gain;
+  }
+  let lab = new Uint8Array(N);
+  for (let i = 0; i < N; i++) lab[i] = floorOf(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]);
+  // 글자(KREON)·작은 얼룩 정리: 5×5 다수결 2번
+  for (let pass = 0; pass < 2; pass++) {
+    const out = new Uint8Array(N);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const cnt = [0, 0, 0, 0, 0];
+      for (let dy = -2; dy <= 2; dy++) { const yy = y + dy; if (yy < 0 || yy >= H) continue;
+        for (let dx = -2; dx <= 2; dx++) { const xx = x + dx; if (xx < 0 || xx >= W) continue; cnt[lab[yy * W + xx]]++; } }
+      let best = 0; for (let k = 1; k <= 4; k++) if (cnt[k] > cnt[best]) best = k;
+      out[y * W + x] = cnt[best] >= 9 ? best : 0;
+    }
+    lab = out;
+  }
+  // 덩어리 나누기
+  const seen = new Int32Array(N).fill(-1); let blobs = [];
+  const minArea = (W * H) / 260;
+  for (let i = 0; i < N; i++) {
+    if (!lab[i] || seen[i] >= 0) continue;
+    const f = lab[i], stack = [i], pts = []; seen[i] = blobs.length;
+    while (stack.length) {
+      const p = stack.pop(); pts.push(p); const x = p % W, y = (p / W) | 0;
+      const nb = [x > 0 ? p - 1 : -1, x < W - 1 ? p + 1 : -1, y > 0 ? p - W : -1, y < H - 1 ? p + W : -1];
+      for (const q of nb) if (q >= 0 && seen[q] < 0 && lab[q] === f) { seen[q] = blobs.length; stack.push(q); }
+    }
+    blobs.push({ floor: f, pts });
+  }
+  blobs = blobs.filter(b => b.pts.length >= minArea).map(b => summarize(b.floor, b.pts, W));
+  // 붙어 버린 같은 색 빌딩 떼어내기 (빌딩 수가 모자랄 때)
+  let guard = 0;
+  while (blobs.length < n * n && blobs.length && guard++ < n * n) {
+    const areas = blobs.map(b => b.area).sort((a, b) => a - b), med = areas[areas.length >> 1];
+    let bi = 0; blobs.forEach((b, i) => { if (b.area > blobs[bi].area) bi = i; });
+    if (blobs[bi].area < med * 1.6) break;
+    const two = splitBlob(blobs[bi], W);
+    blobs.splice(bi, 1, ...two);
+  }
+  // 너무 많으면 작은 것부터 버림 (화살표·그림자 등)
+  blobs.sort((a, b) => b.area - a.area);
+  if (blobs.length > n * n) blobs = blobs.slice(0, n * n);
+  const found = blobs.length;
+  if (found !== n * n) return { ok: false, found, blobs, board: null };
+  // 줄 나누기: 위→아래로 n개씩, 각 줄은 왼→오
+  const byY = [...blobs].sort((a, b) => a.y - b.y), board = [];
+  for (let r = 0; r < n; r++) {
+    const row = byY.slice(r * n, r * n + n).sort((a, b) => a.x - b.x);
+    row.forEach((b, c) => { b.r = r; b.c = c; });
+    board.push(row.map(b => b.floor));
+  }
+  return { ok: true, found, blobs, board };
+}
+function summarize(floor, pts, W) {
+  let sx = 0, sy = 0; for (const p of pts) { sx += p % W; sy += (p / W) | 0; }
+  return { floor, pts, area: pts.length, x: sx / pts.length, y: sy / pts.length };
+}
+function splitBlob(b, W) {
+  // 가장 길게 퍼진 방향으로 2개 무리(k-means)
+  const xs = b.pts.map(p => p % W), ys = b.pts.map(p => (p / W) | 0);
+  let c1 = null, c2 = null, best = -1;
+  for (const [ax, ay] of [[1, 0], [0, 1], [1, 1], [1, -1]]) {
+    let mn = Infinity, mx = -Infinity, i1 = 0, i2 = 0;
+    for (let i = 0; i < xs.length; i++) { const t = xs[i] * ax + ys[i] * ay; if (t < mn) { mn = t; i1 = i; } if (t > mx) { mx = t; i2 = i; } }
+    const span = (mx - mn) / Math.hypot(ax, ay);
+    if (span > best) { best = span; c1 = [xs[i1], ys[i1]]; c2 = [xs[i2], ys[i2]]; }
+  }
+  let g1 = [], g2 = [];
+  for (let it = 0; it < 8; it++) {
+    g1 = []; g2 = [];
+    for (let i = 0; i < xs.length; i++) {
+      const d1 = (xs[i] - c1[0]) ** 2 + (ys[i] - c1[1]) ** 2, d2 = (xs[i] - c2[0]) ** 2 + (ys[i] - c2[1]) ** 2;
+      (d1 <= d2 ? g1 : g2).push(i);
+    }
+    const mean = g => [g.reduce((s, i) => s + xs[i], 0) / g.length, g.reduce((s, i) => s + ys[i], 0) / g.length];
+    if (!g1.length || !g2.length) break;
+    c1 = mean(g1); c2 = mean(g2);
+  }
+  return [g1, g2].filter(g => g.length).map(g => summarize(b.floor, g.map(i => b.pts[i]), W));
+}
+if (typeof module !== 'undefined') module.exports = { CARDS, checkBoard, analyzeBoard, floorOf };
+</script>
+
+<!-- ======================= 화면 ======================= -->
+<script>
+const FLOOR_COLORS = ['#999', '#e84b3c', '#f39a1e', '#2fbf62', '#2f74dc'];
+const GUIDE = 0.74;      // 화면 짧은 변 대비 보조선 네모(=카드) 크기
+const MARGIN = 1.2;      // 높은 빌딩이 카드 밖으로 비쳐 보이므로 보조선보다 넓게 잘라 인식
+const WORK = 240;        // 인식용으로 줄이는 크기(px)
+let card = 1, stream = null;
+const $ = id => document.getElementById(id);
+
+function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.toggle('on', s.id === id)); }
+
+// 번호 버튼
+for (let k = 1; k <= 25; k++) {
+  const b = document.createElement('button');
+  b.className = 'num-btn ' + (k <= 10 ? 's3' : 's4'); b.textContent = k;
+  b.onclick = () => { card = k; openCamera(); };
+  $(k <= 10 ? 'btns3' : 'btns4').appendChild(b);
+}
+
+async function openCamera() {
+  $('cam-badge').textContent = '문제 ' + card;
+  $('cam-error').style.display = 'none';
+  show('cam'); drawGuide();
+  if (stream) return;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1920 } }, audio: false });
+    $('video').srcObject = stream; await $('video').play();
+  } catch (e) {
+    $('cam-error').innerHTML = '📷 카메라를 켤 수 없어요.<br>브라우저에서 카메라 사용을 허용하거나,<br>오른쪽 아래 <b>🖼️ 사진</b>으로 찍은 사진을 골라 주세요.';
+    $('cam-error').style.display = 'block';
+  }
+}
+function stopCamera() { if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; } }
+function backToPick() { stopCamera(); show('pick'); }
+document.addEventListener('visibilitychange', () => { if (document.hidden) stopCamera(); else if ($('cam').classList.contains('on')) openCamera(); });
+
+// 보조선: 네모 + 칸 + 문제 번호 모서리 표시
+function guideRect() {
+  const w = innerWidth, h = innerHeight, s = Math.min(w, h) * GUIDE;
+  return { x: (w - s) / 2, y: (h - s) / 2, s };
+}
+function drawGuide() {
+  const cv = $('overlay'), dpr = devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const { x, y, s } = guideRect(), n = CARDS[card].size;
+  ctx.fillStyle = 'rgba(0,0,0,0.45)';
+  ctx.fillRect(0, 0, innerWidth, y); ctx.fillRect(0, y + s, innerWidth, innerHeight - y - s);
+  ctx.fillRect(0, y, x, s); ctx.fillRect(x + s, y, innerWidth - x - s, s);
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.setLineDash([]); ctx.strokeRect(x, y, s, s);
+  // 모서리 강조
+  ctx.strokeStyle = '#ffd54f'; ctx.lineWidth = 8; const L = s * 0.12;
+  [[x, y, 1, 1], [x + s, y, -1, 1], [x, y + s, 1, -1], [x + s, y + s, -1, -1]].forEach(([cx, cy, dx, dy]) => {
+    ctx.beginPath(); ctx.moveTo(cx + dx * L, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + dy * L); ctx.stroke(); });
+  // 문제 번호 삼각형 자리
+  ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.beginPath();
+  ctx.moveTo(x, y); ctx.lineTo(x + s * 0.2, y); ctx.lineTo(x, y + s * 0.2); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#fff'; ctx.font = `${Math.round(s * 0.035)}px Jua, sans-serif`;
+  ctx.fillText('번호', x + s * 0.02, y + s * 0.07);
+  // 칸 자리(카드의 칸 위치에 맞춤)
+  const g0 = n === 3 ? 0.26 : 0.18, gs = n === 3 ? 0.48 : 0.65;
+  ctx.strokeStyle = 'rgba(255,255,255,0.55)'; ctx.lineWidth = 2; ctx.setLineDash([8, 8]);
+  for (let i = 0; i <= n; i++) {
+    const t = g0 + gs * i / n;
+    ctx.beginPath(); ctx.moveTo(x + s * g0, y + s * t); ctx.lineTo(x + s * (g0 + gs), y + s * t); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x + s * t, y + s * g0); ctx.lineTo(x + s * t, y + s * (g0 + gs)); ctx.stroke();
+  }
+}
+addEventListener('resize', () => { if ($('cam').classList.contains('on')) drawGuide(); });
+
+// 찍기: 화면에 보이는 보조선 네모 영역만 잘라냄
+function takePhoto() {
+  const v = $('video'); if (!v.videoWidth) return;
+  const vw = v.videoWidth, vh = v.videoHeight, sw = innerWidth, sh = innerHeight;
+  const scale = Math.max(sw / vw, sh / vh);           // object-fit: cover
+  const ox = (sw - vw * scale) / 2, oy = (sh - vh * scale) / 2;
+  const { x, y, s } = guideRect();
+  const m = s * (MARGIN - 1) / 2;
+  const src = { x: (x - m - ox) / scale, y: (y - m - oy) / scale, s: s * MARGIN / scale };
+  runAnalysis(v, src);
+}
+function fromFile(input) {
+  const f = input.files[0]; if (!f) return;
+  const img = new Image();
+  img.onload = () => {
+    // 사진은 가운데에서 짧은 변의 GUIDE 비율만큼 정사각형으로 자름(카메라 보조선과 같은 규칙)
+    const s = Math.min(img.width, img.height) * 0.86;
+    runAnalysis(img, { x: (img.width - s) / 2, y: (img.height - s) / 2, s });
+    URL.revokeObjectURL(img.src); input.value = '';
+  };
+  img.src = URL.createObjectURL(f);
+}
+
+function runAnalysis(source, src) {
+  $('busy').style.display = 'flex';
+  setTimeout(() => {
+    const work = document.createElement('canvas'); work.width = work.height = WORK;
+    const wctx = work.getContext('2d', { willReadFrequently: true });
+    wctx.drawImage(source, src.x, src.y, src.s, src.s, 0, 0, WORK, WORK);
+    const res = analyzeBoard(wctx.getImageData(0, 0, WORK, WORK), CARDS[card].size);
+    // 결과 그림용
+    const rc = $('result-canvas'), R = 520; rc.width = rc.height = R;
+    const rctx = rc.getContext('2d'); rctx.drawImage(source, src.x, src.y, src.s, src.s, 0, 0, R, R);
+    stopCamera(); showResult(res, rctx, R / WORK); show('result');
+    $('busy').style.display = 'none';
+  }, 30);
+}
+
+function showResult(res, ctx, k) {
+  const n = CARDS[card].size;
+  $('res-title').textContent = '문제 ' + card;
+  const v = $('verdict'), sub = $('verdict-sub');
+  // 찾은 빌딩 표시
+  res.blobs.forEach(b => {
+    ctx.beginPath(); ctx.arc(b.x * k, b.y * k, 20, 0, Math.PI * 2);
+    ctx.fillStyle = '#fff'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = FLOOR_COLORS[b.floor]; ctx.stroke();
+    ctx.fillStyle = FLOOR_COLORS[b.floor]; ctx.font = '26px Jua, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(b.floor, b.x * k, b.y * k + 1);
+  });
+  const mini = $('mini'); mini.innerHTML = '';
+  if (!res.ok) {
+    v.className = 'verdict retake'; v.textContent = '📸 다시 찍어 볼까요?';
+    sub.textContent = `빌딩 ${n * n}개 중 ${res.found}개만 찾았어요. 카드를 네모에 맞추고 위에서 똑바로 찍어요.`;
+    mini.style.display = 'none'; $('mini-cap').style.display = 'none';
+    return;
+  }
+  mini.style.display = 'grid'; $('mini-cap').style.display = 'block';
+  mini.style.gridTemplateColumns = `repeat(${n}, 34px)`;
+  res.board.flat().forEach(f => { const d = document.createElement('div'); d.style.background = FLOOR_COLORS[f]; d.textContent = f; mini.appendChild(d); });
+  if (checkBoard(res.board, CARDS[card])) {
+    v.className = 'verdict ok'; v.textContent = '🎉 정답이에요!'; sub.textContent = '완벽한 빌딩 숲이에요!';
+  } else {
+    v.className = 'verdict no'; v.textContent = '🤔 다시 생각해 볼까요?'; sub.textContent = '화살표 단서와 줄 규칙을 다시 살펴봐요.';
+  }
+}
+</script>
+</body>
+</html>
