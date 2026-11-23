@@ -247,11 +247,12 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
   .title-container { padding: 18px 22px; }
   #start-screen { padding: calc(70px + env(safe-area-inset-top, 0px)) 12px 20px; box-sizing: border-box; justify-content: flex-start; overflow-y: auto; }
   .title-container { margin-bottom: 20px; }
-  .mode-container { gap: 12px; width: 100%; max-width: 380px; margin-bottom: 20px; }
+  .mode-container { gap: 10px; width: 100%; max-width: 540px; margin-bottom: 20px; }
   .mode-card { width: auto; flex: 1 1 0; min-width: 0; padding: 18px 10px; border-radius: 24px; }
   .btn-help { font-size: 1.2rem; padding: 12px 32px; }
   .mode-icon { width: 92px; height: 80px; margin: 0 auto 8px; }
-  .mode-title { font-size: 1.4rem; }
+  .mode-title { font-size: 1.25rem; white-space: nowrap; }
+  .mode-desc { font-size: 0.9rem; }
   .teacher-mark { font-size: 0.9rem; right: 15px; }
 }
 @media (orientation: portrait) and (min-width: 601px) {
@@ -304,6 +305,11 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
       <svg class="mode-icon" viewBox="0 0 120 104" aria-hidden="true"><rect x="4" y="68" width="36" height="36" rx="9" fill="#f7a198"/><rect x="4" y="64" width="36" height="36" rx="9" fill="#ffe6e2" stroke="#f7a198" stroke-width="3"/><text x="22.0" y="83.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#c96a5f">1</text><rect x="42" y="44" width="36" height="36" rx="9" fill="#f5d377"/><rect x="42" y="40" width="36" height="36" rx="9" fill="#fff6d6" stroke="#f5d377" stroke-width="3"/><text x="60.0" y="59.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#b08a2c">2</text><rect x="80" y="20" width="36" height="36" rx="9" fill="#93d9ad"/><rect x="80" y="16" width="36" height="36" rx="9" fill="#e2f8ea" stroke="#93d9ad" stroke-width="3"/><text x="98.0" y="35.0" text-anchor="middle" dominant-baseline="central" font-family="Jua, sans-serif" font-size="24" fill="#4d9e6c">3</text></svg>
       <p class="mode-title" id="t-mode-2d-title">숫자 세계</p>
       <p class="mode-desc" id="t-mode-2d-desc">숫자로 문제를 해결해요</p>
+    </div>
+    <div class="mode-card" tabindex="0" onclick="location.href='camera.html'" onkeydown="if(event.key==='Enter')location.href='camera.html'">
+      <svg class="mode-icon" viewBox="0 0 120 104" aria-hidden="true"><rect x="10" y="26" width="100" height="70" rx="16" fill="#eef4ff" stroke="#8fb0e8" stroke-width="3"/><path d="M38 26 L46 12 L74 12 L82 26" fill="#dce8ff" stroke="#8fb0e8" stroke-width="3" stroke-linejoin="round"/><circle cx="60" cy="60" r="24" fill="#ffffff" stroke="#8fb0e8" stroke-width="3"/><rect x="47" y="58" width="8" height="12" rx="2" fill="#e84b3c"/><rect x="56" y="52" width="8" height="18" rx="2" fill="#2fbf62"/><rect x="65" y="46" width="8" height="24" rx="2" fill="#2f74dc"/><circle cx="96" cy="40" r="5" fill="#f7c42f"/></svg>
+      <p class="mode-title" id="t-mode-cam-title">카메라 세계</p>
+      <p class="mode-desc" id="t-mode-cam-desc">만든 판을 찍어 확인해요</p>
     </div>
   </div>
   <button id="help-btn" class="btn-help">놀이 방법</button>
@@ -416,7 +422,7 @@ button:focus-visible, .mode-card:focus-visible, .inv-item:focus-visible { outlin
 const translations = {
   ko: {
     mainTitle: "들쑥날쑥 빌딩 숲", subtitle: "Skyscrapers", mode3dTitle: "블록 세계", mode3dDesc: "직접 건물을 지어봐요",
-    mode2dTitle: "숫자 세계", mode2dDesc: "숫자로 문제를 해결해요", helpBtn: "놀이 방법",
+    mode2dTitle: "숫자 세계", mode2dDesc: "숫자로 문제를 해결해요", modeCamTitle: "카메라 세계", modeCamDesc: "만든 판을 찍어 확인해요", helpBtn: "놀이 방법",
     modalTitle: "🏙️ 스카이스크래퍼 놀이 방법",
     rule1Title: "1. 건물의 개수", rule1Desc: "3x3 판: 1, 2, 3층 건물이 각각 3개씩, 총 9개가 필요해요.<br>4x4 판: 1, 2, 3, 4층 건물이 각각 4개씩, 총 16개가 필요해요.",
     rule2Title: "2. 건물 세우기", rule2Desc: "가로줄과 세로줄에 층별 건물을 모두 한 개씩 세워주세요.<br>한 줄에 같은 높이의 건물이 두 개 있으면 안 돼요!",
@@ -431,7 +437,7 @@ const translations = {
   },
   en: {
     mainTitle: "Skyscrapers", subtitle: "Building a City Skyline", mode3dTitle: "Block World", mode3dDesc: "Build with blocks",
-    mode2dTitle: "Number World", mode2dDesc: "Solve with numbers", helpBtn: "How to Play",
+    mode2dTitle: "Number World", mode2dDesc: "Solve with numbers", modeCamTitle: "Camera World", modeCamDesc: "Snap your board to check", helpBtn: "How to Play",
     modalTitle: "🏙️ How to Play Skyscrapers",
     rule1Title: "1. Number of Buildings", rule1Desc: "3x3 Board: 3 of each 1, 2, 3-story buildings (Total 9).<br>4x4 Board: 4 of each 1, 2, 3, 4-story buildings (Total 16).",
     rule2Title: "2. Building Rules", rule2Desc: "Place one building of each height in every row and column.<br>No two buildings of the same height in a line!",
@@ -452,7 +458,7 @@ function updateLanguage() {
   const t = translations[currentLang];
   const set = (id, v, html) => { const el = document.getElementById(id); if (html) el.innerHTML = v; else el.innerText = v; };
   set('t-main-title', t.mainTitle); set('t-subtitle', t.subtitle); set('t-mode-3d-title', t.mode3dTitle); set('t-mode-3d-desc', t.mode3dDesc);
-  set('t-mode-2d-title', t.mode2dTitle); set('t-mode-2d-desc', t.mode2dDesc); set('help-btn', t.helpBtn);
+  set('t-mode-2d-title', t.mode2dTitle); set('t-mode-2d-desc', t.mode2dDesc); set('t-mode-cam-title', t.modeCamTitle); set('t-mode-cam-desc', t.modeCamDesc); set('help-btn', t.helpBtn);
   set('lang-btn', t.langBtn); set('t-modal-title', t.modalTitle);
   set('t-rule-1-title', t.rule1Title); set('t-rule-1-desc', t.rule1Desc, true);
   set('t-rule-2-title', t.rule2Title); set('t-rule-2-desc', t.rule2Desc, true);
